@@ -1,20 +1,39 @@
 {
-  "name": "modern-github-portfolio",
+  "name": "goldjunge91-portfolio",
   "version": "1.0.0",
-  "description": "Moderne GitHub Portfolio Page mit 3D-Loading Screen, interaktivem Sternenhimmel, responsiver Projektübersicht, Kontaktbereich und Dark Mode Toggle.",
+  "description": "Modern 3D Portfolio Website with Three.js",
+  "main": "index.html",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
   },
+  "keywords": [
+    "portfolio",
+    "threejs",
+    "3d",
+    "webgl",
+    "animation",
+    "gsap",
+    "tailwindcss"
+  ],
+  "author": "goldjunge91",
+  "license": "MIT",
   "dependencies": {
-    "three": "^0.153.0",
-    "gsap": "^3.11.0"
+    "three": "^0.158.0",
+    "gsap": "^3.12.2"
   },
   "devDependencies": {
-    "vite": "^4.0.0",
-    "tailwindcss": "^3.2.0",
-    "postcss": "^8.4.16",
-    "autoprefixer": "^10.4.7"
-  }
+    "vite": "^5.0.0",
+    "gh-pages": "^6.1.0",
+    "tailwindcss": "^3.3.6",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/goldjunge91/goldjunge91.github.io.git"
+  },
+  "homepage": "https://goldjunge91.github.io"
 }
