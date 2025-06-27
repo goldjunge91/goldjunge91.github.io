@@ -34,8 +34,16 @@ function animateLoading() {
 }
 animateLoading();
 
-// Simuliere Ladezeit, dann Übergang zur Hauptseite
-setTimeout(() => {
+// Funktion zum Initialisieren der Hauptszene
+function initMainScene() {
+  console.log("Initialisiere Hauptszene...");
+  mainContent.classList.remove("hidden");
+  animateStars();
+}
+
+// Alternative Variante: GSAP-Animation mit delayedCall (als Fallback)
+gsap.delayedCall(4, () => {
+  console.log("Starte GSAP-FadeOut für Loading-Screen...");
   gsap.to(loadingScreen, {
     opacity: 0,
     duration: 1,
@@ -44,7 +52,7 @@ setTimeout(() => {
       initMainScene();
     }
   });
-}, 4000); // 4 Sekunden Ladezeit
+});
 
 // -------------------------
 // Hauptseite: Sternenhimmel und UI
@@ -84,12 +92,6 @@ function animateStars() {
   renderer.render(scene, camera);
 }
   
-// Initialisiere Hauptszene
-function initMainScene() {
-  mainContent.classList.remove("hidden");
-  animateStars();
-}
-
 // -------------------------
 // Dark Mode Toggle
 // -------------------------
