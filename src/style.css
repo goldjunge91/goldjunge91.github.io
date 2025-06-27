@@ -1,0 +1,21 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-neon { color: #00ffff; }
+  .text-babyblue { color: #89CFF0; }
+}
+
+.skill-tag {
+  @apply bg-blue-900 text-white px-3 py-1 rounded-full;
+}
+
+.card {
+  @apply bg-gray-800 p-4 rounded-lg shadow-lg;
+}
+
+.btn {
+  @apply mt-2 inline-block bg-neon text-black px-4 py-2 rounded hover:bg-opacity-80 transition;
+}

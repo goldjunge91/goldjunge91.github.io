@@ -1,50 +1,66 @@
 <!DOCTYPE html>
-<html lang=
-de>
+<html lang="de">
 <head>
-  <meta charset=UTF-8 />
-  <meta name=viewport content=width=device-width
-initial-scale=1.0 />
-  <title>goldjunge91 – Portfolio</title>
-  <link rel=stylesheet href=style.css />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marco – Portfolio</title>
+  <link rel="stylesheet" href="/src/style.css" />
 </head>
-<body>
-  <header>
-    <h1>👋 Hallo, ich bin goldjunge91</h1>
-    <p>Willkommen auf meinem Portfolio!</p>
+<body class="bg-black text-white">
+
+  <div id="loader" class="fixed inset-0 flex items-center justify-center bg-black z-50">
+    <canvas id="loaderCanvas" class="w-full h-full"></canvas>
+  </div>
+
+  <header class="text-center py-10">
+    <h1 class="text-5xl font-bold text-neon">Hi, ich bin Marco</h1>
+    <p class="text-xl mt-4">example</p>
   </header>
 
-  <section>
-    <h2>Über mich</h2>
-    <p>Ich bin ein technikbegeisterter Entwickler mit Fokus auf Web, Embedded und Automatisierung.</p>
-  </section>
+  <main class="space-y-16 p-4">
+    <section id="about" class="text-center">
+      <h2 class="text-3xl font-semibold text-babyblue">Über mich</h2>
+      <p class="mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+    </section>
 
-  <section>
-    <h2>Fähigkeiten</h2>
-    <ul>
-      <li>JavaScript / TypeScript</li>
-      <li>React / Next.js</li>
-      <li>Raspberry Pi, ESP32, Automatisierung</li>
-      <li>Git, Docker, Linux</li>
-    </ul>
-  </section>
+    <section id="skills" class="text-center">
+      <h2 class="text-3xl font-semibold text-babyblue">Skills</h2>
+      <div class="flex flex-wrap justify-center gap-4 mt-4">
+        <span class="skill-tag">JavaScript</span>
+        <span class="skill-tag">TypeScript</span>
+        <span class="skill-tag">React</span>
+      </div>
+    </section>
 
-  <section>
-    <h2>Projekte</h2>
-    <ul>
-      <li><strong>Versandfinder App</strong> – React Native App zum Finden günstiger Versandoptionen</li>
-      <li><strong>CarryAll Pro</strong> – Ladeflächensicherung mit Sensorik und Web-UI</li>
-    </ul>
-  </section>
+    <section id="projects" class="text-center">
+      <h2 class="text-3xl font-semibold text-babyblue">Projekte</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div class="card">
+          <h3 class="text-xl font-bold">Projekt 1</h3>
+          <p>Beschreibung des Projekts</p>
+          <a href="#" class="btn">Live ansehen</a>
+        </div>
+        <div class="card">
+          <h3 class="text-xl font-bold">Projekt 2</h3>
+          <p>Beschreibung des Projekts</p>
+          <a href="#" class="btn">GitHub</a>
+        </div>
+      </div>
+    </section>
 
-  <section>
-    <h2>Kontakt</h2>
-    <p>Du kannst mir gerne eine <a href=mailto:deine@email.de>E-Mail</a> schreiben.</p>
-  </section>
+    <section id="contact" class="text-center">
+      <h2 class="text-3xl font-semibold text-babyblue">Kontakt</h2>
+      <p class="mt-2">
+        <a href="mailto:example@example.com" class="underline">E-Mail</a> |
+        <a href="https://github.com/goldjunge91" class="underline">GitHub</a>
+      </p>
+    </section>
+  </main>
 
-  <footer>
-    <p>&copy; 2025 goldjunge91</p>
+  <footer class="text-center text-sm text-gray-500 py-4">
+    &copy; 2025 Marco
   </footer>
+
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>
-
