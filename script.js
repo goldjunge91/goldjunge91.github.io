@@ -832,3 +832,8 @@ window.portfolioApp = {
     camera,
     renderer
 };
+
+console.log('Preloader Renderer:', preloaderRenderer);
+console.log('Preloader Particles:', preloaderParticles);
+console.log('Preloader Scene:', preloaderScene);
+console.log('Preloader Camera:', preloaderCamera);
