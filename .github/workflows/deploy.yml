@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
+      - Futuristisch_3D_interactive
 
 permissions:
   contents: write
