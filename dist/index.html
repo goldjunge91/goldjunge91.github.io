@@ -3,102 +3,380 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>goldjunge91 - 3D Portfolio</title>
-    <meta name="description" content="goldjunge91 - Full Stack Developer Portfolio mit 3D-Effekten">
-    <meta name="keywords" content="developer, portfolio, three.js, webgl, javascript, full-stack">
-    <meta property="og:title" content="goldjunge91 - 3D Portfolio">
-    <meta property="og:description" content="Interaktive 3D Portfolio Website mit modernen Webtechnologien">
+    <title>goldjunge91 - Immersive Digital Creations</title>
+    <meta name="description" content="goldjunge91 - Full Stack Developer Portfolio mit atemberaubenden 3D-Erlebnissen und immersiven Designs.">
+    <meta name="keywords" content="developer, portfolio, three.js, webgl, javascript, full-stack, immersive, digital art, creative development">
+    <meta property="og:title" content="goldjunge91 - Immersive Digital Creations">
+    <meta property="og:description" content="Erleben Sie digitale Kunst und Entwicklung: Interaktive 3D-Portfolio-Website mit modernen Webtechnologien.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://goldjunge91.github.io">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/locomotive-scroll@4.1.3/dist/locomotive-scroll.min.css">
+    
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        'neon-blue': '#00f5ff',
-                        'neon-purple': '#b300ff',
-                        'dark-bg': '#0a0a0a',
-                        'dark-card': '#1a1a1a'
+                        'dark-primary': '#0a0a0a', /* Deep dark background */
+                        'dark-secondary': '#1a1a1a', /* Slightly lighter dark for cards/elements */
+                        'neon-blue': '#00f5ff', /* Vibrant blue accent */
+                        'neon-purple': '#b300ff', /* Vibrant purple accent */
+                        'text-light-mode': '#f0f0f0', /* Light text for dark backgrounds */
+                        'text-dark-mode': '#101010', /* Dark text for light mode (if needed, but mainly dark theme) */
+                        'border-dark': '#3a3a3a', /* Subtle border for dark theme */
+                    },
+                    fontFamily: {
+                        'heading': ['Montserrat', 'sans-serif'], /* For bold headlines */
+                        'body': ['Inter', 'sans-serif'], /* For readability */
                     }
                 }
             }
         }
     </script>
-  <script type="module" crossorigin src="./assets/index-D_f3anOD.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-CI_Q9g9a.css">
+    <style>
+        /* Base styles for the immersive dark theme */
+        body {
+            font-family: theme('fontFamily.body');
+            color: theme('colors.text-light-mode');
+            background-color: theme('colors.dark-primary');
+            overflow-x: hidden; /* Prevent horizontal scroll from Three.js or other elements */
+        }
+
+        /* Loading Screen adjustments for new colors */
+        #loading-screen {
+            background-color: theme('colors.dark-primary');
+            transition: opacity 1s ease-out;
+        }
+        .loading-text {
+            color: theme('colors.text-light-mode');
+        }
+        .progress-bar {
+            background-color: theme('colors.dark-secondary');
+        }
+        #progress-fill {
+            background: linear-gradient(to right, theme('colors.neon-blue'), theme('colors.neon-purple'));
+        }
+        #progress-text {
+            color: theme('colors.text-light-mode');
+        }
+
+        /* Dark Mode Toggle - ensure icon colors match new theme */
+        #theme-toggle {
+            background-color: theme('colors.dark-secondary');
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        #theme-icon {
+            color: theme('colors.neon-blue');
+        }
+        body.light #theme-toggle { /* If a light mode were to be toggled, though this design leans dark */
+            background-color: theme('colors.secondary-light');
+        }
+        body.light #theme-icon {
+            color: theme('colors.dark-primary');
+        }
+
+        /* Navigation Header */
+        #main-header {
+            background-color: rgba(10, 10, 10, 0.6); /* Semi-transparent dark background */
+            backdrop-filter: blur(12px); /* Stronger blur */
+            transition: background-color 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+        }
+        .logo {
+            background-image: linear-gradient(to right, theme('colors.neon-blue'), theme('colors.neon-purple'));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            font-family: theme('fontFamily.heading');
+            letter-spacing: -0.05em; /* Tighter letter spacing for impact */
+        }
+        .nav-link {
+            color: theme('colors.text-light-mode');
+            position: relative;
+            font-family: theme('fontFamily.body');
+            font-weight: 500;
+            padding-bottom: 5px;
+            transition: color 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background-color: theme('colors.neon-blue'); /* Neon accent on hover */
+            transition: width 0.3s ease-in-out;
+        }
+        .nav-link:hover {
+            color: theme('colors.neon-blue');
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero-section h1 {
+            font-family: theme('fontFamily.heading');
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            background-image: linear-gradient(to right, theme('colors.neon-blue'), theme('colors.text-light-mode'), theme('colors.neon-purple'));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px rgba(0, 245, 255, 0.3), 0 0 30px rgba(179, 0, 255, 0.2); /* Subtle neon glow */
+            animation: pulse-glow 3s infinite alternate; /* More pronounced glow */
+        }
+
+        @keyframes pulse-glow {
+            0% { text-shadow: 0 0 10px rgba(0, 245, 255, 0.3), 0 0 20px rgba(179, 0, 255, 0.2); }
+            100% { text-shadow: 0 0 20px rgba(0, 245, 255, 0.5), 0 0 40px rgba(179, 0, 255, 0.4); }
+        }
+
+        .hero-section p {
+            color: theme('colors.text-light-mode');
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Star Navigation (more dramatic look) */
+        .star-button {
+            background-color: theme('colors.dark-secondary');
+            border: 1px solid theme('colors.border-dark');
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), inset 0 0 8px rgba(0, 245, 255, 0.1); /* Deeper shadow with inner glow */
+            transform-style: preserve-3d; /* Enable 3D transforms */
+            transition: all 0.3s ease;
+        }
+        .star-button:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(0, 245, 255, 0.2);
+            border-color: theme('colors.neon-blue');
+        }
+        .star-icon {
+            color: theme('colors.neon-blue'); /* Consistent neon accent */
+            text-shadow: 0 0 10px rgba(0, 245, 255, 0.5); /* Glow for icons */
+        }
+        .star-button span {
+            color: theme('colors.text-light-mode');
+        }
+
+        /* Section Styling - more pronounced background colors */
+        .section-dark-primary {
+            background-color: theme('colors.dark-primary');
+        }
+        .section-dark-secondary {
+            background-color: theme('colors.dark-secondary');
+        }
+
+        h2.headline-gradient {
+            font-family: theme('fontFamily.heading');
+            letter-spacing: -0.03em;
+            background-image: linear-gradient(to right, theme('colors.neon-blue'), theme('colors.text-light-mode'), theme('colors.neon-purple'));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(0, 245, 255, 0.2), 0 0 20px rgba(179, 0, 255, 0.1);
+        }
+
+        /* Card Styling (Skills, Projects) */
+        .skill-card, .project-card {
+            background-color: theme('colors.dark-secondary');
+            border: 1px solid theme('colors.border-dark');
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 0 5px rgba(0, 245, 255, 0.05);
+        }
+        .skill-card:hover, .project-card:hover {
+            border-color: theme('colors.neon-blue');
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(0, 245, 255, 0.1);
+        }
+        .skill-card .skill-icon i, .project-card .project-image i {
+            color: theme('colors.neon-blue');
+            text-shadow: 0 0 8px rgba(0, 245, 255, 0.4);
+        }
+        .skill-card h3, .project-card h3 {
+            font-family: theme('fontFamily.heading');
+            color: theme('colors.text-light-mode');
+        }
+        .skill-card p, .project-card p {
+            font-family: theme('fontFamily.body');
+            color: theme('colors.text-light-mode');
+            opacity: 0.8;
+        }
+
+        .tech-tag {
+            background-color: rgba(0, 245, 255, 0.1); /* Light neon background */
+            color: theme('colors.neon-blue');
+            border: 1px solid rgba(0, 245, 255, 0.2);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: theme('colors.neon-blue');
+            color: theme('colors.dark-primary'); /* Dark text on neon button */
+            font-family: theme('fontFamily.heading');
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.4);
+        }
+        .btn-primary:hover {
+            background-color: theme('colors.neon-purple'); /* Hover to purple */
+            box-shadow: 0 0 20px rgba(179, 0, 255, 0.6);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background-color: transparent;
+            border-color: theme('colors.neon-blue');
+            color: theme('colors.neon-blue');
+            font-family: theme('fontFamily.body');
+            box-shadow: inset 0 0 5px rgba(0, 245, 255, 0.2);
+        }
+        .btn-secondary:hover {
+            background-color: theme('colors.neon-blue');
+            color: theme('colors.dark-primary');
+            box-shadow: inset 0 0 10px rgba(0, 245, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+
+        /* Contact Section */
+        .contact-link {
+            color: theme('colors.text-light-mode');
+        }
+        .contact-link:hover {
+            color: theme('colors.neon-blue');
+            text-shadow: 0 0 8px rgba(0, 245, 255, 0.4);
+        }
+        input, textarea {
+            background-color: theme('colors.dark-secondary');
+            border-color: theme('colors.border-dark');
+            color: theme('colors.text-light-mode');
+        }
+        input:focus, textarea:focus {
+            border-color: theme('colors.neon-blue');
+            box-shadow: 0 0 8px rgba(0, 245, 255, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            background-color: theme('colors.dark-primary');
+            color: theme('colors.text-light-mode');
+            opacity: 0.6;
+        }
+
+        /* Custom Cursor (More prominent for immersive feel) */
+        .custom-cursor {
+            width: 30px; /* Larger */
+            height: 30px;
+            background-color: rgba(0, 245, 255, 0.4); /* Neon blue glow */
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.8); /* Stronger glow */
+            border: 1px solid rgba(0, 245, 255, 0.6);
+        }
+        a:hover ~ .custom-cursor, button:hover ~ .custom-cursor, .star-button:hover ~ .custom-cursor {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(179, 0, 255, 0.6); /* Purple on hover */
+            box-shadow: 0 0 30px rgba(179, 0, 255, 1);
+        }
+
+        /* Locomotive Scroll styles (minimal, usually handled by library CSS) */
+        html.has-scroll-smooth {
+            overflow: hidden;
+        }
+        html.has-scroll-dragging {
+            user-select: none;
+        }
+        .has-scroll-smooth body {
+            overflow: hidden;
+        }
+        [data-scroll-container] {
+            min-height: 100vh;
+        }
+
+        /* Ensure Three.js canvas covers the screen without affecting layout */
+        #star-field {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Behind content */
+            pointer-events: none;
+        }
+    </style>
+  <script type="module" crossorigin src="./assets/index-B68m0SIj.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-in1eaJEy.css">
 </head>
-<body class="bg-gray-900 text-white overflow-x-hidden">
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="fixed inset-0 z-50 bg-black flex items-center justify-center">
+<body class="text-text-light-mode bg-dark-primary">
+    <div class="custom-cursor"></div>
+
+    <div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="text-center">
             <div id="loading-3d" class="w-32 h-32 mx-auto mb-8"></div>
             <div class="loading-text text-2xl font-bold mb-4">Loading...</div>
-            <div class="progress-bar w-64 h-2 bg-gray-800 rounded-full overflow-hidden">
-                <div id="progress-fill" class="h-full bg-gradient-to-r from-neon-blue to-neon-purple w-0 transition-all duration-300"></div>
+            <div class="progress-bar w-64 h-2 rounded-full overflow-hidden">
+                <div id="progress-fill" class="h-full w-0 transition-all duration-300"></div>
             </div>
-            <div id="progress-text" class="mt-2 text-sm text-gray-400">0%</div>
+            <div id="progress-text" class="mt-2 text-sm">0%</div>
         </div>
     </div>
 
-    <!-- Dark Mode Toggle -->
-    <button id="theme-toggle" class="fixed top-6 right-6 z-40 w-12 h-12 bg-gray-800 dark:bg-gray-700 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110">
-        <i id="theme-icon" class="fas fa-moon text-neon-blue"></i>
+    <button id="theme-toggle" class="fixed top-6 right-6 z-40 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110">
+        <i id="theme-icon" class="fas fa-moon"></i>
     </button>
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 left-0 w-full z-30 bg-black/20 backdrop-blur-md">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="text-2xl font-bold bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+    <nav id="main-header" class="fixed top-0 left-0 w-full z-30 py-4 px-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="text-2xl font-bold logo">
                 goldjunge91
             </div>
             <div class="hidden md:flex space-x-8">
-                <a href="#home" class="nav-link hover:text-neon-blue transition-colors">Home</a>
-                <a href="#about" class="nav-link hover:text-neon-blue transition-colors">Über mich</a>
-                <a href="#skills" class="nav-link hover:text-neon-blue transition-colors">Skills</a>
-                <a href="#projects" class="nav-link hover:text-neon-blue transition-colors">Projekte</a>
-                <a href="#contact" class="nav-link hover:text-neon-blue transition-colors">Kontakt</a>
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#about" class="nav-link">Über mich</a>
+                <a href="#skills" class="nav-link">Skills</a>
+                <a href="#projects" class="nav-link">Projekte</a>
+                <a href="#contact" class="nav-link">Kontakt</a>
             </div>
-        </div>
+            </div>
     </nav>
 
-    <!-- Star Field Background -->
-    <div id="star-field" class="fixed inset-0 z-0"></div>
+    <div id="star-field"></div>
 
-    <!-- Main Content -->
-    <main class="relative z-10">
-        <!-- Hero Section -->
-        <section id="home" class="min-h-screen flex items-center justify-center relative">
-            <div class="text-center max-w-4xl mx-auto px-6">
-                <div class="mb-8">
-                    <h1 class="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-neon-blue via-white to-neon-purple bg-clip-text text-transparent animate-pulse">
+    <main data-scroll-container>
+        <section id="home" data-scroll-section class="min-h-screen flex items-center justify-center relative section-dark-primary">
+            <div class="text-center max-w-5xl mx-auto px-6" data-scroll data-scroll-speed="-0.5"> <div class="mb-8">
+                    <h1 class="text-7xl md:text-9xl font-bold mb-6 animate-pulse">
                         goldjunge91
                     </h1>
-                    <p class="text-xl md:text-2xl text-gray-300 mb-8">
-                        Full Stack Developer & 3D Enthusiast
+                    <p class="text-2xl md:text-3xl mb-8">
+                        Crafting Immersive Digital Experiences
                     </p>
                 </div>
                 
-                <!-- Interactive Star Navigation -->
                 <div class="star-navigation grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
-                    <div class="star-button" data-target="about">
+                    <div class="star-button" data-target="about" data-scroll data-scroll-speed="0.2">
                         <div class="star-icon">💫</div>
                         <span>Über mich</span>
                     </div>
-                    <div class="star-button" data-target="skills">
+                    <div class="star-button" data-target="skills" data-scroll data-scroll-speed="0.2">
                         <div class="star-icon">🚀</div>
                         <span>Skills</span>
                     </div>
-                    <div class="star-button" data-target="projects">
+                    <div class="star-button" data-target="projects" data-scroll data-scroll-speed="0.2">
                         <div class="star-icon">🌌</div>
                         <span>Projekte</span>
                     </div>
-                    <div class="star-button" data-target="contact">
+                    <div class="star-button" data-target="contact" data-scroll data-scroll-speed="0.2">
                         <div class="star-icon">📬</div>
                         <span>Kontakt</span>
                     </div>
@@ -106,101 +384,98 @@
             </div>
         </section>
 
-        <!-- About Section -->
-        <section id="about" class="min-h-screen py-20 px-6">
+        <section id="about" data-scroll-section class="min-h-screen py-24 px-6 section-dark-secondary">
             <div class="container mx-auto max-w-6xl">
-                <h2 class="text-4xl md:text-6xl font-bold text-center mb-16 bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+                <h2 data-scroll data-scroll-speed="0.1" class="text-5xl md:text-7xl font-bold text-center mb-20 headline-gradient">
                     Über mich
                 </h2>
-                <div class="grid md:grid-cols-2 gap-12 items-center">
-                    <div class="space-y-6">
-                        <p class="text-lg text-gray-300 leading-relaxed">
-                            Hallo! Ich bin goldjunge91, ein leidenschaftlicher Full Stack Developer mit einer Vorliebe für moderne Webtechnologien und beeindruckende 3D-Visualisierungen.
+                <div class="grid md:grid-cols-2 gap-16 items-center">
+                    <div data-scroll data-scroll-speed="0.2" class="space-y-8">
+                        <p class="text-xl leading-relaxed text-text-light-mode opacity-90">
+                            Hallo! Ich bin goldjunge91, ein leidenschaftlicher Full Stack Developer mit einer tiefen Faszination für immersive Webtechnologien und atemberaubende 3D-Visualisierungen.
                         </p>
-                        <p class="text-lg text-gray-300 leading-relaxed">
-                            Meine Expertise liegt in der Entwicklung innovativer Web-Lösungen, die sowohl funktional als auch visuell beeindruckend sind. Von interaktiven Frontend-Anwendungen bis hin zu robusten Backend-Systemen.
+                        <p class="text-xl leading-relaxed text-text-light-mode opacity-90">
+                            Meine Expertise liegt in der Kreation innovativer digitaler Erlebnisse, die nicht nur exzellent funktionieren, sondern auch visuell fesseln. Von hochinteraktiven Frontends bis zu robusten Backend-Systemen.
                         </p>
-                        <p class="text-lg text-gray-300 leading-relaxed">
-                            Ich arbeite gerne mit modernen Technologien wie JavaScript, Three.js, Node.js und verschiedenen Frontend-Frameworks, um einzigartige digitale Erlebnisse zu schaffen.
+                        <p class="text-xl leading-relaxed text-text-light-mode opacity-90">
+                            Ich liebe es, mit Cutting-Edge-Technologien wie JavaScript, Three.js, Node.js und den neuesten Frontend-Frameworks zu experimentieren, um einzigartige digitale Welten zu erschaffen.
                         </p>
                     </div>
-                    <div class="relative">
-                        <div class="w-64 h-64 mx-auto bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-code text-6xl text-neon-blue"></i>
+                    <div data-scroll data-scroll-speed="0.3" class="relative">
+                        <div class="w-72 h-72 mx-auto bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 rounded-full flex items-center justify-center shadow-lg border border-neon-blue/30">
+                            <i class="fas fa-code text-7xl text-neon-blue animate-pulse"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Skills Section -->
-        <section id="skills" class="min-h-screen py-20 px-6">
+        <section id="skills" data-scroll-section class="min-h-screen py-24 px-6 section-dark-primary">
             <div class="container mx-auto max-w-6xl">
-                <h2 class="text-4xl md:text-6xl font-bold text-center mb-16 bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+                <h2 data-scroll data-scroll-speed="0.1" class="text-5xl md:text-7xl font-bold text-center mb-20 headline-gradient">
                     Skills
                 </h2>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="skill-card">
+                <div class="grid md:grid-cols-3 gap-10">
+                    <div class="skill-card" data-scroll data-scroll-speed="0.1" data-scroll-delay="0.1">
                         <div class="skill-icon">
-                            <i class="fab fa-js-square text-4xl text-yellow-400"></i>
+                            <i class="fab fa-js-square text-5xl text-yellow-400"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-4">JavaScript</h3>
-                        <p class="text-gray-300">Modern ES6+, React, Vue.js, Node.js</p>
+                        <h3>JavaScript</h3>
+                        <p>Modern ES6+, React, Vue.js, Node.js</p>
                     </div>
-                    <div class="skill-card">
+                    <div class="skill-card" data-scroll data-scroll-speed="0.1" data-scroll-delay="0.2">
                         <div class="skill-icon">
-                            <i class="fab fa-html5 text-4xl text-orange-500"></i>
+                            <i class="fab fa-html5 text-5xl text-orange-500"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-4">Frontend</h3>
-                        <p class="text-gray-300">HTML5, CSS3, TailwindCSS, Sass</p>
+                        <h3>Frontend</h3>
+                        <p>HTML5, CSS3, TailwindCSS, Sass</p>
                     </div>
-                    <div class="skill-card">
+                    <div class="skill-card" data-scroll data-scroll-speed="0.1" data-scroll-delay="0.3">
                         <div class="skill-icon">
-                            <i class="fas fa-cube text-4xl text-neon-blue"></i>
+                            <i class="fas fa-cube text-5xl text-neon-blue"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-4">3D Graphics</h3>
-                        <p class="text-gray-300">Three.js, WebGL, Blender</p>
+                        <h3>3D Graphics</h3>
+                        <p>Three.js, WebGL, Blender</p>
                     </div>
-                    <div class="skill-card">
+                    <div class="skill-card" data-scroll data-scroll-speed="0.1" data-scroll-delay="0.4">
                         <div class="skill-icon">
-                            <i class="fab fa-git-alt text-4xl text-red-500"></i>
+                            <i class="fab fa-git-alt text-5xl text-red-500"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-4">Tools</h3>
-                        <p class="text-gray-300">Git, Vite, Webpack, Docker</p>
+                        <h3>Tools</h3>
+                        <p>Git, Vite, Webpack, Docker</p>
                     </div>
-                    <div class="skill-card">
+                    <div class="skill-card" data-scroll data-scroll-speed="0.1" data-scroll-delay="0.5">
                         <div class="skill-icon">
-                            <i class="fas fa-database text-4xl text-green-500"></i>
+                            <i class="fas fa-database text-5xl text-green-500"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-4">Backend</h3>
-                        <p class="text-gray-300">Node.js, MongoDB, PostgreSQL, API Design</p>
+                        <h3>Backend</h3>
+                        <p>Node.js, MongoDB, PostgreSQL, API Design</p>
                     </div>
-                    <div class="skill-card">
+                    <div class="skill-card" data-scroll data-scroll-speed="0.1" data-scroll-delay="0.6">
                         <div class="skill-icon">
-                            <i class="fas fa-mobile-alt text-4xl text-purple-500"></i>
+                            <i class="fas fa-mobile-alt text-5xl text-purple-500"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-4">Responsive</h3>
-                        <p class="text-gray-300">Mobile-First, PWA, Cross-Browser</p>
+                        <h3>Responsive</h3>
+                        <p>Mobile-First, PWA, Cross-Browser</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Projects Section -->
-        <section id="projects" class="min-h-screen py-20 px-6">
+        <section id="projects" data-scroll-section class="min-h-screen py-24 px-6 section-dark-secondary">
             <div class="container mx-auto max-w-6xl">
-                <h2 class="text-4xl md:text-6xl font-bold text-center mb-16 bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+                <h2 data-scroll data-scroll-speed="0.1" class="text-5xl md:text-7xl font-bold text-center mb-20 headline-gradient">
                     Projekte
                 </h2>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="project-card">
-                        <div class="project-image bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 h-48 flex items-center justify-center">
-                            <i class="fas fa-rocket text-4xl text-neon-blue"></i>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <div class="project-card" data-scroll data-scroll-speed="0.1" data-scroll-delay="0.1">
+                        <div class="project-image bg-gradient-to-br from-neon-blue/20 to-neon-purple/20">
+                            <i class="fas fa-rocket text-5xl text-neon-blue"></i>
                         </div>
-                        <div class="project-content p-6">
-                            <h3 class="text-xl font-bold mb-3">3D Portfolio</h3>
-                            <p class="text-gray-300 mb-4">Interaktive 3D Portfolio-Website mit Three.js und modernen Animationen</p>
-                            <div class="flex flex-wrap gap-2 mb-4">
+                        <div class="project-content">
+                            <h3>3D Portfolio</h3>
+                            <p>Interaktive 3D Portfolio-Website mit Three.js und modernen Animationen</p>
+                            <div class="flex flex-wrap gap-3 mb-4">
                                 <span class="tech-tag">Three.js</span>
                                 <span class="tech-tag">GSAP</span>
                                 <span class="tech-tag">TailwindCSS</span>
@@ -212,14 +487,14 @@
                         </div>
                     </div>
                     
-                    <div class="project-card">
-                        <div class="project-image bg-gradient-to-br from-green-500/20 to-blue-500/20 h-48 flex items-center justify-center">
-                            <i class="fas fa-code text-4xl text-green-400"></i>
+                    <div class="project-card" data-scroll data-scroll-speed="0.1" data-scroll-delay="0.2">
+                        <div class="project-image bg-gradient-to-br from-green-500/20 to-blue-500/20">
+                            <i class="fas fa-code text-5xl text-green-400"></i>
                         </div>
-                        <div class="project-content p-6">
-                            <h3 class="text-xl font-bold mb-3">Web Application</h3>
-                            <p class="text-gray-300 mb-4">Responsive Web-Anwendung mit modernem Design und API-Integration</p>
-                            <div class="flex flex-wrap gap-2 mb-4">
+                        <div class="project-content">
+                            <h3>Web Application</h3>
+                            <p>Responsive Web-Anwendung mit modernem Design und API-Integration</p>
+                            <div class="flex flex-wrap gap-3 mb-4">
                                 <span class="tech-tag">React</span>
                                 <span class="tech-tag">Node.js</span>
                                 <span class="tech-tag">MongoDB</span>
@@ -231,14 +506,14 @@
                         </div>
                     </div>
 
-                    <div class="project-card">
-                        <div class="project-image bg-gradient-to-br from-purple-500/20 to-pink-500/20 h-48 flex items-center justify-center">
-                            <i class="fas fa-gamepad text-4xl text-purple-400"></i>
+                    <div class="project-card" data-scroll data-scroll-speed="0.1" data-scroll-delay="0.3">
+                        <div class="project-image bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+                            <i class="fas fa-gamepad text-5xl text-purple-400"></i>
                         </div>
-                        <div class="project-content p-6">
-                            <h3 class="text-xl font-bold mb-3">3D Game</h3>
-                            <p class="text-gray-300 mb-4">Browser-basiertes 3D-Spiel mit WebGL und Physics Engine</p>
-                            <div class="flex flex-wrap gap-2 mb-4">
+                        <div class="project-content">
+                            <h3>3D Game</h3>
+                            <p>Browser-basiertes 3D-Spiel mit WebGL und Physics Engine</p>
+                            <div class="flex flex-wrap gap-3 mb-4">
                                 <span class="tech-tag">WebGL</span>
                                 <span class="tech-tag">JavaScript</span>
                                 <span class="tech-tag">Canvas</span>
@@ -253,43 +528,41 @@
             </div>
         </section>
 
-        <!-- Contact Section -->
-        <section id="contact" class="min-h-screen py-20 px-6">
+        <section id="contact" data-scroll-section class="min-h-screen py-24 px-6 section-dark-primary">
             <div class="container mx-auto max-w-4xl text-center">
-                <h2 class="text-4xl md:text-6xl font-bold mb-16 bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+                <h2 data-scroll data-scroll-speed="0.1" class="text-5xl md:text-7xl font-bold mb-20 headline-gradient">
                     Kontakt
                 </h2>
-                <p class="text-xl text-gray-300 mb-12">
+                <p class="text-2xl mb-12 text-text-light-mode opacity-90">
                     Bereit für ein neues Projekt? Lass uns zusammenarbeiten!
                 </p>
                 
-                <div class="flex justify-center space-x-8 mb-12">
-                    <a href="mailto:goldjunge91@example.com" class="contact-link">
-                        <i class="fas fa-envelope text-3xl"></i>
+                <div class="flex justify-center space-x-12 mb-16">
+                    <a href="mailto:goldjunge91@example.com" class="contact-link" data-scroll data-scroll-speed="0.1">
+                        <i class="fas fa-envelope text-4xl"></i>
                         <span>E-Mail</span>
                     </a>
-                    <a href="https://github.com/goldjunge91" class="contact-link" target="_blank">
-                        <i class="fab fa-github text-3xl"></i>
+                    <a href="https://github.com/goldjunge91" class="contact-link" target="_blank" data-scroll data-scroll-speed="0.1">
+                        <i class="fab fa-github text-4xl"></i>
                         <span>GitHub</span>
                     </a>
-                    <a href="https://linkedin.com/in/goldjunge91" class="contact-link" target="_blank">
-                        <i class="fab fa-linkedin text-3xl"></i>
+                    <a href="https://linkedin.com/in/goldjunge91" class="contact-link" target="_blank" data-scroll data-scroll-speed="0.1">
+                        <i class="fab fa-linkedin text-4xl"></i>
                         <span>LinkedIn</span>
                     </a>
                 </div>
 
-                <!-- Contact Form -->
-                <form class="max-w-lg mx-auto space-y-6" id="contact-form">
+                <form class="max-w-lg mx-auto space-y-8" id="contact-form" data-scroll data-scroll-speed="0.1">
                     <div>
-                        <input type="text" placeholder="Dein Name" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-neon-blue focus:outline-none transition-colors">
+                        <input type="text" placeholder="Dein Name" required>
                     </div>
                     <div>
-                        <input type="email" placeholder="Deine E-Mail" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-neon-blue focus:outline-none transition-colors">
+                        <input type="email" placeholder="Deine E-Mail" required>
                     </div>
                     <div>
-                        <textarea placeholder="Deine Nachricht" rows="5" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-neon-blue focus:outline-none transition-colors resize-none"></textarea>
+                        <textarea placeholder="Deine Nachricht" rows="6" required class="resize-none"></textarea>
                     </div>
-                    <button type="submit" class="btn-primary w-full">
+                    <button type="submit" class="btn-primary w-full py-4 text-xl">
                         Nachricht senden
                     </button>
                 </form>
@@ -297,10 +570,102 @@
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="relative z-10 py-8 text-center text-gray-500">
+    <footer class="relative z-10 py-10 text-center text-text-light-mode opacity-70 bg-dark-primary">
         <p>&copy; 2024 goldjunge91. Made with ❤️ and Three.js</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@4.1.3/dist/locomotive-scroll.min.js"></script>
+    <script>
+        // Theme toggle logic (remains similar, just ensures colors align with new palette)
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.body.classList.add('dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeIcon.style.color = '#f0f0f0'; // text-light-mode
+            } else {
+                document.body.classList.remove('dark');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeIcon.style.color = '#101010'; // text-dark-mode (for a light theme)
+            }
+        };
+
+        // Load saved theme on initial load or default to dark
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else {
+            applyTheme('dark'); // Default to dark for this immersive design
+        }
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.body.classList.contains('dark') ? 'dark' : 'light';
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                applyTheme(newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+        }
+        
+        // Header scroll behavior (more subtle for fixed nav)
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('main-header');
+            if (window.scrollY > 80) { // Adjust scroll threshold
+                header.style.backgroundColor = 'rgba(10, 10, 10, 0.85)'; // Less transparent
+                header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.4)';
+            } else {
+                header.style.backgroundColor = 'rgba(10, 10, 10, 0.6)'; // More transparent
+                header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+            }
+        });
+
+        // Smooth scroll for internal links (overridden by Locomotive Scroll when active)
+        document.querySelectorAll('.nav-link[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (window.locomotiveScroll) { // Check if Locomotive Scroll is active
+                    window.locomotiveScroll.scrollTo(targetElement, {
+                        duration: 1000, // Duration in milliseconds
+                        easing: [0.77, 0, 0.175, 1] // Custom bezier curve for smooth ease
+                    });
+                } else if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Star button navigation (now uses Locomotive Scroll)
+        document.querySelectorAll('.star-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const target = button.getAttribute('data-target');
+                const section = document.getElementById(target);
+                
+                if (section && window.locomotiveScroll) {
+                    gsap.to(button, {
+                        scale: 0.9,
+                        duration: 0.1,
+                        yoyo: true,
+                        repeat: 1,
+                        ease: "power2.out"
+                    });
+                    window.locomotiveScroll.scrollTo(section, {
+                        duration: 1000,
+                        easing: [0.77, 0, 0.175, 1]
+                    });
+                }
+            });
+            // Hover effects handled by CSS and GSAP in script.js
+        });
+
+    </script>
 </body>
 </html>

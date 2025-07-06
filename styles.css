@@ -1,241 +1,315 @@
-/* Custom Styles */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+/* goldjunge91.github.io-Business_Elegant/styles.css */
 
-:root {
-    --neon-blue: #00f5ff;
-    --neon-purple: #b300ff;
-    --dark-bg: #0a0a0a;
-    --dark-card: #1a1a1a;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* General Body & HTML Styling for immersive dark theme */
+html {
+    scroll-behavior: smooth; /* Ensures smooth scrolling for browser's default behavior */
 }
 
 body {
-    font-family: 'Orbitron', monospace;
-    background: radial-gradient(circle at center, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
-    overflow-x: hidden;
+    font-family: 'Inter', sans-serif; /* Default body font */
+    line-height: 1.6;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Background colors and text colors are primarily handled by Tailwind in index.html */
 }
 
-/* Loading Screen Animations */
+/* Custom properties for theme colors, defined by Tailwind.config.js */
+/* If not using Tailwind, these would be directly defined here as --dark-primary: #0a0a0a; etc. */
+
+/* Container for consistent content width */
+.container {
+    max-width: 1280px; /* Slightly wider for immersive feel */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 2rem; /* More padding for spaciousness */
+    padding-right: 2rem;
+}
+
+/* Loading Screen related styles */
 #loading-screen {
-    background: linear-gradient(45deg, #000000, #1a1a2e, #000000);
-    background-size: 400% 400%;
-    animation: gradientShift 3s ease infinite;
+    background-color: var(--dark-primary); /* Deep dark background */
+    transition: opacity 0.8s ease-out;
 }
-
-@keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-}
-
 .loading-text {
-    background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple), var(--neon-blue));
-    background-size: 200% 200%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: textGlow 2s ease-in-out infinite;
+    color: var(--text-light-mode);
+}
+.progress-bar {
+    background-color: var(--dark-secondary);
+}
+#progress-fill {
+    background: linear-gradient(to right, var(--neon-blue), var(--neon-purple));
+}
+#progress-text {
+    color: var(--text-light-mode);
 }
 
-@keyframes textGlow {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+/* Star Field Background - No specific CSS needed here, managed by Three.js */
+#star-field {
+    /* Ensures it covers the entire viewport */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none; /* Allows clicks/interactions on elements below it */
+    z-index: -1; /* Placed behind all content */
 }
 
-/* Star Navigation */
-.star-navigation {
-    perspective: 1000px;
+/* Custom Particle Effect Styling (for click animations) */
+.particle {
+    position: fixed;
+    background-color: var(--neon-blue); /* Neon blue by default for particles */
+    border-radius: 50%;
+    pointer-events: none; /* Important: particles should not interfere with clicks */
+    z-index: 9999; /* Ensure particles are on top */
+    transform: translate(-50%, -50%); /* Center the particle div on its coordinates */
+    opacity: 0; /* Starts hidden, animated by GSAP */
 }
 
+/* Navigation Header */
+#main-header {
+    /* Styles are mostly inlined in index.html with Tailwind and a script block */
+    /* Ensure the backdrop-filter and background-color are consistent */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 30;
+    background-color: rgba(10, 10, 10, 0.6); /* Default semi-transparent dark */
+    backdrop-filter: blur(12px); /* Stronger blur effect */
+    -webkit-backdrop-filter: blur(12px);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.logo {
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -0.05em;
+    font-weight: 800; /* Bolder for impact */
+    font-size: 2.25rem; /* Larger */
+}
+
+.nav-link {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    position: relative;
+    padding-bottom: 5px;
+    transition: color 0.3s ease;
+}
+.nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--neon-blue);
+    transition: width 0.3s ease-in-out;
+}
+.nav-link:hover::after {
+    width: 100%;
+}
+.nav-link:hover {
+    color: var(--neon-blue);
+}
+
+/* Hero Section */
+.hero-section h1 {
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    font-weight: 900; /* Extra bold */
+}
+.hero-section p {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+}
+
+/* Star Navigation (more dramatic) */
 .star-button {
-    @apply cursor-pointer p-6 text-center transition-all duration-300 hover:scale-110;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(0, 245, 255, 0.3);
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
-    transform-style: preserve-3d;
+    background-color: var(--dark-secondary);
+    border: 1px solid var(--border-dark);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), inset 0 0 8px rgba(0, 245, 255, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    transform-style: preserve-3d; /* For GSAP 3D transforms */
 }
-
 .star-button:hover {
-    background: rgba(0, 245, 255, 0.1);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(0, 245, 255, 0.2);
     border-color: var(--neon-blue);
-    box-shadow: 0 0 30px rgba(0, 245, 255, 0.3);
-    transform: translateY(-10px) rotateX(10deg);
 }
-
 .star-icon {
-    @apply text-4xl mb-3 block;
-    filter: drop-shadow(0 0 10px currentColor);
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+}
+.star-button span {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
 }
 
-/* Skill Cards */
-.skill-card {
-    @apply p-6 text-center transition-all duration-300 hover:scale-105;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
+/* Section Styling */
+section {
+    padding-top: 6rem; /* Generous padding */
+    padding-bottom: 6rem;
+    position: relative;
+}
+.section-dark-primary {
+    background-color: var(--dark-primary);
+}
+.section-dark-secondary {
+    background-color: var(--dark-secondary);
 }
 
-.skill-card:hover {
-    background: rgba(255, 255, 255, 0.1);
+h2.headline-gradient {
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -0.03em;
+    font-weight: 800; /* Bold for section titles */
+}
+
+/* Card Styling (Skills, Projects) */
+.skill-card, .project-card {
+    background-color: var(--dark-secondary);
+    border: 1px solid var(--border-dark);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 0 5px rgba(0, 245, 255, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.skill-card:hover, .project-card:hover {
     border-color: var(--neon-blue);
-    box-shadow: 0 10px 30px rgba(0, 245, 255, 0.2);
-    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(0, 245, 255, 0.1);
 }
-
-.skill-icon {
-    @apply mb-4;
-    filter: drop-shadow(0 0 10px currentColor);
+.skill-card .skill-icon, .project-card .project-image {
+    height: 140px; /* Taller for more presence */
 }
-
-/* Project Cards */
-.project-card {
-    @apply bg-gray-800/50 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+.skill-card .skill-icon i, .project-card .project-image i {
+    font-size: 4rem; /* Larger icons */
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px rgba(0, 245, 255, 0.6); /* More pronounced icon glow */
 }
-
-.project-card:hover {
-    box-shadow: 0 20px 40px rgba(0, 245, 255, 0.2);
-    border-color: var(--neon-blue);
-    transform: translateY(-10px) scale(1.05);
+.skill-card h3, .project-card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: var(--text-light-mode);
 }
-
-.project-image {
-    @apply transition-transform duration-300;
-}
-
-.project-card:hover .project-image {
-    transform: scale(1.1);
+.skill-card p, .project-card p {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-light-mode);
+    opacity: 0.8;
 }
 
 .tech-tag {
-    @apply px-3 py-1 text-xs bg-neon-blue/20 text-neon-blue rounded-full border border-neon-blue/30;
+    background-color: rgba(0, 245, 255, 0.15); /* Slightly darker neon background */
+    color: var(--neon-blue);
+    border: 1px solid rgba(0, 245, 255, 0.3);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    padding: 0.3rem 0.8rem;
 }
 
 /* Buttons */
 .btn-primary {
-    @apply px-6 py-3 bg-gradient-to-r from-neon-blue to-neon-purple text-white rounded-lg font-semibold transition-all duration-300 hover:scale-105;
-    text-decoration: none;
-    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+    background-color: var(--neon-blue);
+    color: var(--dark-primary);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
-
 .btn-primary:hover {
-    box-shadow: 0 0 30px rgba(0, 245, 255, 0.5);
-    transform: translateY(-2px) scale(1.05);
+    background-color: var(--neon-purple); /* Hover to purple */
+    box-shadow: 0 0 25px rgba(179, 0, 255, 0.7);
+    transform: translateY(-3px);
 }
-
 .btn-secondary {
-    @apply px-6 py-3 border border-gray-600 text-gray-300 rounded-lg font-semibold transition-all duration-300 hover:border-neon-blue hover:text-neon-blue;
-    text-decoration: none;
-}
-
-/* Contact Links */
-.contact-link {
-    @apply flex flex-col items-center space-y-2 p-6 rounded-xl transition-all duration-300 hover:scale-110;
-    color: #fff;
-    text-decoration: none;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-}
-
-.contact-link:hover {
-    background: rgba(0, 245, 255, 0.1);
-    border-color: var(--neon-blue);
+    background-color: transparent;
+    border: 2px solid var(--neon-blue);
     color: var(--neon-blue);
-    box-shadow: 0 0 30px rgba(0, 245, 255, 0.3);
-    transform: translateY(-10px) scale(1.1);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    box-shadow: inset 0 0 8px rgba(0, 245, 255, 0.3);
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+.btn-secondary:hover {
+    background-color: var(--neon-blue);
+    color: var(--dark-primary);
+    box-shadow: inset 0 0 15px rgba(0, 245, 255, 0.5);
+    transform: translateY(-3px);
 }
 
-/* Animations */
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
+/* Contact Section */
+.contact-link {
+    color: var(--text-light-mode);
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+.contact-link i {
+    font-size: 2.5rem; /* Larger icons */
+    margin-bottom: 0.5rem;
+}
+.contact-link span {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+}
+.contact-link:hover {
+    color: var(--neon-blue);
+    text-shadow: 0 0 12px rgba(0, 245, 255, 0.6);
+}
+input, textarea {
+    background-color: var(--dark-secondary);
+    border: 1px solid var(--border-dark);
+    color: var(--text-light-mode);
+    font-family: 'Inter', sans-serif;
+    padding: 1rem; /* More generous padding */
+}
+input:focus, textarea:focus {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+    outline: none;
 }
 
-@keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(0, 245, 255, 0.3); }
-    50% { box-shadow: 0 0 40px rgba(0, 245, 255, 0.6); }
+/* Footer */
+footer {
+    background-color: var(--dark-primary);
+    color: var(--text-light-mode);
+    opacity: 0.7;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    padding: 2.5rem 0;
 }
 
-/* Smooth Scrolling */
-html {
-    scroll-behavior: smooth;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(45deg, var(--neon-purple), var(--neon-blue));
-}
-
-/* Dark Mode Transitions */
-.dark {
-    transition: all 0.3s ease;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .star-navigation {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-    }
-    
-    .star-button {
-        padding: 1rem;
-    }
-    
-    .star-icon {
-        font-size: 2rem;
-    }
-}
-
-/* Particle Effects */
-.particle {
-    position: absolute;
-    background: var(--neon-blue);
-    border-radius: 50%;
+/* Custom Cursor (More prominent for immersive feel) */
+.custom-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
     pointer-events: none;
-    animation: particle-float 3s linear infinite;
+    z-index: 99999;
+    width: 25px; /* Larger base size */
+    height: 25px;
+    background-color: rgba(0, 245, 255, 0.4); /* Neon blue glow */
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s ease, height 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.6); /* Initial subtle glow */
+}
+a:hover ~ .custom-cursor, button:hover ~ .custom-cursor, .star-button:hover ~ .custom-cursor {
+    width: 45px; /* Larger on hover */
+    height: 45px;
+    background-color: rgba(179, 0, 255, 0.6); /* Purple on hover */
+    box-shadow: 0 0 30px rgba(179, 0, 255, 0.9); /* Stronger glow on hover */
 }
 
-@keyframes particle-float {
-    0% {
-        transform: translateY(100vh) scale(0);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-100px) scale(1);
-        opacity: 0;
-    }
-}
 
-/* Glitch Effect */
+/* Glitch Effect for H1 (from script.js) */
 .glitch {
+    animation: glitch-animation 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
     position: relative;
-    animation: glitch 2s infinite;
+    overflow: hidden; /* To contain pseudo-elements */
 }
 
-.glitch:before,
-.glitch:after {
+/* Using data-text attribute for the glitch effect (set in script.js) */
+.glitch::before,
+.glitch::after {
     content: attr(data-text);
     position: absolute;
     top: 0;
@@ -244,38 +318,151 @@ html {
     height: 100%;
 }
 
-.glitch:before {
-    animation: glitch-1 0.5s infinite;
-    color: var(--neon-blue);
-    z-index: -1;
+.glitch::before {
+    left: 2px;
+    text-shadow: -2px 0 var(--neon-blue);
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-skew 0.7s infinite alternate-reverse;
 }
 
-.glitch:after {
-    animation: glitch-2 0.5s infinite;
-    color: var(--neon-purple);
-    z-index: -2;
+.glitch::after {
+    left: -2px;
+    text-shadow: -2px 0 var(--neon-purple);
+    clip: rect(84px, 450px, 96px, 0);
+    animation: glitch-skew 0.7s infinite alternate-reverse -0.3s; /* Offset animation */
 }
 
-@keyframes glitch {
-    0%, 100% { transform: translate(0); }
-    20% { transform: translate(-2px, 2px); }
-    40% { transform: translate(-2px, -2px); }
-    60% { transform: translate(2px, 2px); }
-    80% { transform: translate(2px, -2px); }
+@keyframes glitch-animation {
+    0% {
+        transform: translate(0);
+    }
+    20% {
+        transform: translate(-5px, 5px);
+    }
+    40% {
+        transform: translate(-5px, -5px);
+    }
+    60% {
+        transform: translate(5px, 5px);
+    }
+    80% {
+        transform: translate(5px, -5px);
+    }
+    100% {
+        transform: translate(0);
+    }
 }
 
-@keyframes glitch-1 {
-    0%, 100% { transform: translate(0); }
-    10% { transform: translate(-2px, -2px); }
-    20% { transform: translate(2px, 2px); }
-    30% { transform: translate(-2px, 2px); }
-    40% { transform: translate(2px, -2px); }
+@keyframes glitch-skew {
+    0% {
+        transform: skewX(0deg);
+    }
+    20% {
+        transform: skewX(-5deg);
+    }
+    40% {
+        transform: skewX(5deg);
+    }
+    60% {
+        transform: skewX(-5deg);
+    }
+    80% {
+        transform: skewX(5deg);
+    }
+    100% {
+        transform: skewX(0deg);
+    }
 }
 
-@keyframes glitch-2 {
-    0%, 100% { transform: translate(0); }
-    10% { transform: translate(2px, 2px); }
-    20% { transform: translate(-2px, -2px); }
-    30% { transform: translate(2px, -2px); }
-    40% { transform: translate(-2px, 2px); }
+
+/* Locomotive Scrollbar Styling (from snp.agency's CSS) */
+html.has-scroll-smooth {
+    overflow: hidden;
+}
+html.has-scroll-dragging {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+.has-scroll-smooth body {
+    overflow: hidden;
+}
+[data-scroll-container] {
+    min-height: 100vh;
+}
+
+.c-scrollbar {
+    display: none; /* Hide default scrollbar */
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 11px;
+    height: 100%;
+    transform-origin: center right;
+    transition: transform 0.3s, opacity 0.3s;
+    opacity: 0;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.1); /* Subtle track */
+}
+.c-scrollbar:hover {
+    transform: scaleX(1.45);
+}
+.c-scrollbar:hover,
+.has-scroll-dragging .c-scrollbar,
+.has-scroll-scrolling .c-scrollbar {
+    opacity: 1; /* Show on hover/scroll */
+}
+.c-scrollbar_thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0; /* Height controlled by JS */
+    background: linear-gradient(to bottom, var(--neon-blue), var(--neon-purple)); /* Neon gradient thumb */
+    border-radius: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    section {
+        padding-top: 4rem;
+        padding-bottom: 4rem;
+    }
+    .hero-section h1 {
+        font-size: 4rem; /* Smaller for mobile */
+    }
+    .hero-section p {
+        font-size: 1.25rem;
+    }
+    h2.headline-gradient {
+        font-size: 3rem;
+    }
+    .skill-card, .project-card {
+        padding: 1.5rem;
+    }
+    .contact-link i {
+        font-size: 2rem;
+    }
+    .custom-cursor {
+        width: 15px; /* Smaller cursor for mobile */
+        height: 15px;
+    }
+    a:hover ~ .custom-cursor, button:hover ~ .custom-cursor, .star-button:hover ~ .custom-cursor {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+/* Ensure no default browser margins/paddings */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* For debugging / fallback if WebGL is not supported */
+body.no-webgl #star-field {
+    background-color: var(--dark-primary); /* Solid background if 3D fails */
 }

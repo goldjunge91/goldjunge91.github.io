@@ -30,5 +30,10 @@
     "type": "git",
     "url": "https://github.com/goldjunge91/goldjunge91.github.io.git"
   },
-  "homepage": "https://goldjunge91.github.io"
+  "homepage": "https://goldjunge91.github.io",
+  "dependencies": {
+    "gsap": "^3.13.0",
+    "locomotive-scroll": "^4.1.4",
+    "three": "^0.178.0"
+  }
 }
