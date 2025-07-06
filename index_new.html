@@ -108,96 +108,32 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            background: var(--primary-black);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
             color: var(--primary-white);
-            overflow: hidden;
-        }
-        
-        .preloader-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
         }
         
         .preloader-content {
             text-align: center;
-            position: relative;
-            z-index: 10;
-            padding: 2rem;
         }
         
         .preloader-logo {
-            font-size: clamp(2rem, 6vw, 4rem);
+            font-size: 3rem;
             font-weight: 800;
             font-family: var(--font-mono);
             margin-bottom: 2rem;
             opacity: 0;
             animation: fadeInUp 1s ease forwards;
-            background: linear-gradient(45deg, #ffffff, #3b82f6, #8b5cf6);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: fadeInUp 1s ease forwards, gradientShift 3s ease-in-out infinite;
-        }
-        
-        .preloader-subtitle {
-            font-size: 1rem;
-            font-weight: 400;
-            font-family: var(--font-sans);
-            margin-bottom: 3rem;
-            opacity: 0;
-            animation: fadeInUp 1s ease 0.3s forwards;
-            color: rgba(255, 255, 255, 0.7);
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
         }
         
         .preloader-counter {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 600;
             font-family: var(--font-mono);
             letter-spacing: 0.1em;
-            opacity: 0;
-            animation: fadeInUp 1s ease 0.6s forwards;
-            margin-bottom: 1rem;
-        }
-        
-        .preloader-progress {
-            width: 200px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 1px;
-            margin: 0 auto;
-            overflow: hidden;
-            opacity: 0;
-            animation: fadeInUp 1s ease 0.9s forwards;
-        }
-        
-        .preloader-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #10b981);
-            background-size: 200% 100%;
-            border-radius: 1px;
-            width: 0%;
-            transition: width 0.3s ease;
-            animation: progressGlow 2s ease-in-out infinite;
-        }
-        
-        .preloader-particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
         }
         
         @keyframes fadeInUp {
@@ -209,73 +145,6 @@
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
-        
-        @keyframes gradientShift {
-            0%, 100% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-        }
-        
-        @keyframes progressGlow {
-            0%, 100% {
-                background-position: 0% 50%;
-                box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-            }
-            50% {
-                background-position: 100% 50%;
-                box-shadow: 0 0 30px rgba(139, 92, 246, 0.7);
-            }
-        }
-        
-        @keyframes particleFloat {
-            0% {
-                transform: translate(-50%, -50%) translateX(0) translateY(0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, -50%) translateX(var(--end-x)) translateY(var(--end-y)) scale(0);
-                opacity: 0;
-            }
-        }
-        
-        @keyframes particleExplosion {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 1;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(2);
-                opacity: 0;
-            }
-        }
-        
-        /* Preloader enhancement for better visual hierarchy */
-        .preloader-content > * {
-            transform: translateY(20px);
-            opacity: 0;
-        }
-        
-        .preloader-content .preloader-logo {
-            animation-delay: 0.5s;
-        }
-        
-        .preloader-content .preloader-subtitle {
-            animation-delay: 0.8s;
-        }
-        
-        .preloader-content .preloader-counter {
-            animation-delay: 1.1s;
-        }
-        
-        .preloader-content .preloader-progress {
-            animation-delay: 1.4s;
         }
         
         /* Navigation */
@@ -727,52 +596,6 @@
             .skills-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .preloader-logo {
-                font-size: clamp(1.5rem, 8vw, 3rem);
-            }
-            
-            .preloader-subtitle {
-                font-size: 0.8rem;
-                margin-bottom: 2rem;
-            }
-            
-            .preloader-counter {
-                font-size: 1.5rem;
-            }
-            
-            .preloader-progress {
-                width: 150px;
-            }
-        }
-        
-        /* Reduce motion for accessibility */
-        @media (prefers-reduced-motion: reduce) {
-            .preloader-logo {
-                animation: fadeInUp 0.3s ease forwards;
-            }
-            
-            .preloader-subtitle,
-            .preloader-counter,
-            .preloader-progress {
-                animation: fadeInUp 0.3s ease forwards;
-            }
-            
-            @keyframes particleFloat {
-                0% { opacity: 1; transform: translate(-50%, -50%); }
-                100% { opacity: 0; transform: translate(-50%, -50%); }
-            }
-        }
-        
-        /* Performance optimizations */
-        .preloader-canvas {
-            will-change: transform;
-            transform: translateZ(0);
-            backface-visibility: hidden;
-        }
-        
-        .preloader-particles {
-            will-change: contents;
         }
         
         /* Animations */
@@ -806,15 +629,9 @@
 <body>
     <!-- Preloader -->
     <div class="preloader" id="preloader">
-        <canvas class="preloader-canvas" id="preloader-canvas"></canvas>
-        <div class="preloader-particles" id="preloader-particles"></div>
         <div class="preloader-content">
             <div class="preloader-logo">goldjunge91</div>
-            <div class="preloader-subtitle">Creative Developer</div>
             <div class="preloader-counter" id="counter">00</div>
-            <div class="preloader-progress">
-                <div class="preloader-progress-fill" id="progress-fill"></div>
-            </div>
         </div>
     </div>
     

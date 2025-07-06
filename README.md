@@ -12,16 +12,8 @@ Eine atemberaubende, interaktive Portfolio-Website mit 3D-Effekten, Sternenhimme
 - Glitch- und Neon-Effekte
 - Smooth Übergang zur Hauptseite
 
-### 🌌 Interaktiver Sternenhimmel
-- Animierter 3D-Sternenhimmel als Hintergrund
-- Mausbewegung beeinflusst die Kamera
-- Partikel-Effekte und Farbverläufe
-- Responsive WebGL-Rendering
-
-### 💫 Star Navigation
-- Sterne als interaktive Buttons
+### Partial animation
 - 3D-Hover-Effekte mit GSAP
-- Smooth Scrolling zu Sektionen
 - Partikel-Explosionen bei Klicks
 
 ### 📱 Responsive Design
@@ -45,33 +37,6 @@ Eine atemberaubende, interaktive Portfolio-Website mit 3D-Effekten, Sternenhimme
 - **Font Awesome** - Icons
 - **Vanilla JavaScript** - Performance-optimiert
 
-## 🚀 Quick Start
-
-### 1. Repository klonen
-```bash
-git clone https://github.com/goldjunge91/goldjunge91.github.io.git
-cd goldjunge91.github.io
-```
-
-### 2. Dependencies installieren
-```bash
-npm install
-```
-
-### 3. Development Server starten
-```bash
-npm run dev
-```
-
-### 4. Für Production builden
-```bash
-npm run build
-```
-
-### 5. Auf GitHub Pages deployen
-```bash
-npm run deploy
-```
 
 ## 📁 Projektstruktur
 
@@ -89,17 +54,10 @@ goldjunge91.github.io/
 
 ## 🎨 Anpassungen
 
-### Persönliche Informationen
-1. **Kontaktdaten** in `index.html` aktualisieren:
-   ```html
-   <a href="mailto:deine-email@example.com">
-   <a href="https://github.com/dein-username">
-   <a href="https://linkedin.com/in/dein-profil">
-   ```
 
-2. **Skills** in der Skills-Sektion anpassen
-3. **Projekte** mit eigenen Projekten ersetzen
-4. **"Über mich"** Text personalisieren
+1. **Skills** in der Skills-Sektion anpassen
+2. **Projekte** mit eigenen Projekten ersetzen
+3. **"Über mich"** Text personalisieren
 
 ### Design-Anpassungen
 - **Farben** in `tailwind.config` und CSS-Variablen ändern
@@ -125,27 +83,6 @@ goldjunge91.github.io/
 - **GSAP Timelines** - Choreographierte Animationen
 - **Particle Systems** - Interaktive Partikel-Effekte
 
-### 📱 Responsive Features
-- **Mobile Navigation** - Touch-optimierte Bedienung
-- **Adaptive Layouts** - Flexible Grid-Systeme
-- **Performance Mode** - Reduzierte Effekte auf mobilen Geräten
-- **Accessibility** - Screen Reader freundlich
-
-## 🔧 Browser-Unterstützung
-
-- ✅ Chrome 90+
-- ✅ Firefox 88+
-- ✅ Safari 14+
-- ✅ Edge 90+
-- ⚠️ Mobile Browsers (reduzierte 3D-Effekte)
-
-## 📈 Performance
-
-- **First Contentful Paint** < 1.5s
-- **Largest Contentful Paint** < 2.5s
-- **WebGL-Fallbacks** für ältere Geräte
-- **Lazy Loading** für Bilder und Ressourcen
-
 ## 🔍 SEO & Meta Tags
 
 ```html
@@ -155,34 +92,11 @@ goldjunge91.github.io/
 <meta property="og:description" content="Interaktive 3D Portfolio Website">
 ```
 
-## 🤝 Contributing
-
-1. Fork das Repository
-2. Erstelle einen Feature Branch (`git checkout -b feature/amazing-feature`)
-3. Committe deine Änderungen (`git commit -m 'Add amazing feature'`)
-4. Pushe zum Branch (`git push origin feature/amazing-feature`)
-5. Öffne einen Pull Request
-
 ## 📄 Lizenz
 
 Dieses Projekt steht unter der MIT-Lizenz. Siehe [LICENSE](LICENSE) für Details.
 
-## 🙏 Credits
-
-- **Three.js** - 3D-Bibliothek
-- **GSAP** - Animation Library
-- **TailwindCSS** - CSS Framework
-- **Font Awesome** - Icon Library
-
-## 📞 Support
-
-Bei Fragen oder Problemen:
-- 📧 [E-Mail](mailto:your-email@example.com)
-- 🐙 [GitHub Issues](https://github.com/goldjunge91/goldjunge91.github.io/issues)
-- 💬 [Diskussionen](https://github.com/goldjunge91/goldjunge91.github.io/discussions)
 
 ---
 
-**Made with ❤️ and Three.js by [goldjunge91](https://github.com/goldjunge91)**
-
-🌟 **Star this repo if you like it!** 🌟
+**Made with ❤️ by [goldjunge91](https://github.com/goldjunge91)**

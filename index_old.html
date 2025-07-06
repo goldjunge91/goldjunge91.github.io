@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>goldjunge91 - Modernes Business Portfolio</title>
+    <meta name="description" content="goldjunge91 - Modernes und elegantes Portfolio für Webentwicklung und digitale Lösungen.">
+    <meta name="keywords" content="developer, portfolio, three.js, webgl, javascript, full-stack, elegant, business, modern">
+    <meta property="og:title" content="goldjunge91 - Modernes Business Portfolio">
+    <meta property="og:description" content="Professionelle Portfolio-Website mit elegantem Design und subtilen Webtechnologien.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://goldjunge91.github.io">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Neue+Montreal:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script> <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#1a1a1a', /* Dark Grey (for dark mode backgrounds/text) */
+                        'secondary-light': '#f8f9fa', /* Light Grey (for card backgrounds, light text) */
+                        'accent-blue': '#007bff', /* Blue as primary accent */
+                        'accent-green': '#28a745', /* Green as optional secondary accent */
+                        'text-dark': '#212529', /* Dark text for light backgrounds */
+                        'text-light': '#6c757d', /* Lighter grey text for light backgrounds */
+                        'bg-light': '#ffffff', /* White background (Light Mode default) */
+                        'card-bg-light': '#f1f1f1', /* Slightly off-white for cards (Light Mode) */
+                        'border-light': '#e0e0e0', /* Light border */
+
+                        /* Dark Mode Colors (Sanfte Grautöne) */
+                        'bg-dark': '#1a1a1a', /* Dark background */
+                        'card-bg-dark': '#2c2c2c', /* Slightly lighter dark for cards */
+                        'text-dark-mode': '#f8f9fa', /* Light text for dark backgrounds */
+                        'text-light-dark-mode': '#ced4da', /* Slightly darker light text */
+                        'border-dark': '#3a3a3a', /* Dark border */
+                    },
+                    fontFamily: {
+                        'primary': ['"Neue Montreal"', 'sans-serif'], // Conceptual, might need self-hosting or substitute
+                        'secondary': ['Inter', 'sans-serif'],
+                        'tertiary': ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Base styles for light mode */
+        body {
+            font-family: var(--font-secondary, 'Inter', sans-serif);
+            color: theme('colors.text-dark');
+            background-color: theme('colors.bg-light');
+            transition: background-color 0.5s ease, color 0.5s ease; /* Smooth theme transition */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Dark mode styles */
+        body.dark {
+            background-color: theme('colors.bg-dark');
+            color: theme('colors.text-dark-mode');
+        }
+        body.dark .loading-text, body.dark #progress-text {
+            color: theme('colors.text-dark-mode');
+        }
+
+        body.dark #main-header {
+            background-color: rgba(26, 26, 26, 0.8); /* Dark background with blur */
+            backdrop-filter: blur(10px);
+        }
+
+        body.dark .logo, body.dark .nav-link {
+            color: theme('colors.text-dark-mode') !important; /* Important to override transparent/gradient */
+        }
+        body.dark .nav-link:hover {
+            color: theme('colors.accent-blue') !important;
+        }
+
+        body.dark .hero-section .text-text-light { /* Updated from text-gray-300 */
+            color: theme('colors.text-light-dark-mode');
+        }
+
+        body.dark .skill-card,
+        body.dark .project-card {
+            background-color: theme('colors.card-bg-dark');
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-color: theme('colors.border-dark');
+        }
+        body.dark .skill-card h3,
+        body.dark .project-card h3 {
+            color: theme('colors.text-dark-mode');
+        }
+        body.dark .skill-card p,
+        body.dark .project-card p {
+            color: theme('colors.text-light-dark-mode');
+        }
+
+        body.dark .btn-primary {
+            background-color: theme('colors.accent-blue');
+            color: #fff;
+        }
+        body.dark .btn-secondary {
+            background-color: theme('colors.card-bg-dark');
+            border-color: theme('colors.border-dark');
+            color: theme('colors.text-dark-mode');
+        }
+        body.dark .btn-secondary:hover {
+            background-color: theme('colors.border-dark');
+        }
+
+        body.dark .tech-tag {
+            background-color: theme('colors.border-dark');
+            color: theme('colors.text-dark-mode');
+        }
+
+        body.dark .contact-link {
+            color: theme('colors.text-dark-mode');
+        }
+        body.dark .contact-link:hover {
+            color: theme('colors.accent-blue');
+        }
+        body.dark input, body.dark textarea {
+            background-color: theme('colors.card-bg-dark');
+            border-color: theme('colors.border-dark');
+            color: theme('colors.text-dark-mode');
+        }
+        body.dark input:focus, body.dark textarea:focus {
+            border-color: theme('colors.accent-blue');
+        }
+        body.dark footer {
+            color: theme('colors.text-light-dark-mode');
+            background-color: theme('colors.bg-dark');
+        }
+
+        /* Specific styles not easily handled by Tailwind classes inline */
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background-color: theme('colors.accent-blue');
+            transition: width 0.3s ease-in-out;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Smooth transitions for theme change */
+        .hero-section h1, .hero-section p,
+        .skill-card, .project-card,
+        .btn-primary, .btn-secondary,
+        .contact-link, input, textarea, footer {
+            transition: color 0.5s ease, background-color 0.5s ease, box-shadow 0.5s ease, border-color 0.5s ease;
+        }
+
+        /* Loading Screen adjustments for new colors */
+        #loading-screen {
+            background-color: theme('colors.primary-dark'); /* Dark grey background */
+        }
+        .progress-bar {
+            background-color: theme('colors.border-dark');
+        }
+        #progress-fill {
+            background: linear-gradient(to right, theme('colors.accent-blue'), theme('colors.accent-green')); /* Accent colors for progress bar */
+        }
+
+        /* Star Navigation adjustments for elegant look */
+        .star-button {
+            @apply flex flex-col items-center justify-center p-6 rounded-lg cursor-pointer transition-all duration-300;
+            background-color: theme('colors.card-bg-light');
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Soft shadow */
+            border: 1px solid theme('colors.border-light');
+        }
+        .star-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: theme('colors.accent-blue');
+        }
+        .dark .star-button {
+            background-color: theme('colors.card-bg-dark');
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-color: theme('colors.border-dark');
+        }
+        .dark .star-button:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border-color: theme('colors.accent-blue');
+        }
+        .star-icon {
+            @apply text-5xl mb-4;
+            color: theme('colors.accent-blue'); /* Use accent color for icons */
+        }
+        .star-button span {
+            @apply text-lg font-semibold;
+            color: theme('colors.text-dark');
+        }
+        .dark .star-button span {
+            color: theme('colors.text-dark-mode');
+        }
+
+        /* Skill Card styling */
+        .skill-card {
+            @apply bg-card-bg-light p-8 rounded-lg shadow-md text-center transition-all duration-300;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Soft shadow */
+            border: 1px solid theme('colors.border-light');
+        }
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: theme('colors.accent-blue');
+        }
+        .skill-card .skill-icon {
+            @apply mb-6 text-accent-blue;
+        }
+        .skill-card h3 {
+            @apply text-xl font-bold mb-4 text-text-dark;
+            font-family: theme('fontFamily.tertiary');
+        }
+        .skill-card p {
+            @apply text-text-light;
+            font-family: theme('fontFamily.secondary');
+        }
+
+        /* Project Card styling */
+        .project-card {
+            @apply bg-card-bg-light rounded-lg shadow-md overflow-hidden transition-all duration-300;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid theme('colors.border-light');
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: theme('colors.accent-blue');
+        }
+        .project-card .project-image {
+            @apply h-48 flex items-center justify-center;
+        }
+        .project-card .project-content {
+            @apply p-6;
+        }
+        .project-card h3 {
+            @apply text-xl font-bold mb-3 text-text-dark;
+            font-family: theme('fontFamily.tertiary');
+        }
+        .project-card p {
+            @apply text-text-light mb-4;
+            font-family: theme('fontFamily.secondary');
+        }
+        .tech-tag {
+            @apply inline-block px-3 py-1 bg-secondary-light text-text-dark text-sm rounded-full font-medium;
+            border: 1px solid theme('colors.border-light');
+            font-family: theme('fontFamily.secondary');
+        }
+        .dark .tech-tag {
+            background-color: theme('colors.border-dark');
+            color: theme('colors.text-dark-mode');
+            border-color: theme('colors.border-dark');
+        }
+
+        .btn { /* Base button styles for general purpose */
+            @apply inline-block px-6 py-3 rounded-md font-semibold text-white;
+            font-family: theme('fontFamily.secondary');
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        }
+        .btn-primary {
+            @apply bg-accent-blue hover:bg-opacity-90;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+        }
+        .btn-secondary {
+            @apply bg-transparent border-2 border-border-light text-text-dark hover:bg-secondary-light;
+            color: theme('colors.text-dark');
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+        }
+        .dark .btn-secondary {
+            @apply border-border-dark text-text-dark-mode hover:bg-border-dark;
+        }
+
+        .contact-link {
+            @apply flex flex-col items-center text-text-dark hover:text-accent-blue transition-colors;
+            font-family: theme('fontFamily.secondary');
+        }
+        .contact-link span {
+            @apply mt-2 text-lg font-medium;
+        }
+        input, textarea {
+            @apply w-full px-4 py-3 bg-secondary-light border border-border-light rounded-lg focus:border-accent-blue focus:outline-none transition-colors;
+            font-family: theme('fontFamily.secondary');
+            color: theme('colors.text-dark');
+        }
+        input:focus, textarea:focus {
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+        }
+        .dark input, .dark textarea {
+            @apply bg-card-bg-dark border-border-dark text-text-dark-mode focus:border-accent-blue;
+        }
+        .dark input:focus, .dark textarea:focus {
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+        }
+
+        /* Global Headline Styling (from gradient clip) */
+        .headline-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            background-image: linear-gradient(to right, theme('colors.accent-blue'), theme('colors.accent-green'));
+            font-family: theme('fontFamily.primary');
+            font-weight: 700;
+        }
+        /* Specific adjustments for hero H1, without glitch */
+        .hero-section h1 {
+            background-image: linear-gradient(to right, theme('colors.accent-blue'), theme('colors.text-dark'), theme('colors.accent-green')); /* Adjust gradient for light mode */
+            font-family: theme('fontFamily.primary');
+            font-weight: 800;
+            animation: none; /* Remove previous pulse */
+            text-shadow: none; /* Remove previous glow */
+        }
+        .dark .hero-section h1 {
+            background-image: linear-gradient(to right, theme('colors.accent-blue'), theme('colors.text-dark-mode'), theme('colors.accent-green'));
+        }
+        .hero-section p {
+            color: theme('colors.text-light');
+        }
+        .dark .hero-section p {
+            color: theme('colors.text-light-dark-mode');
+        }
+
+        /* Custom Cursor (Subtle for elegant theme) */
+        .custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 99999;
+            width: 15px; /* Smaller and more subtle */
+            height: 15px;
+            background-color: rgba(0, 123, 255, 0.15); /* Very light accent */
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s ease, height 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+            opacity: 0.8;
+            box-shadow: none; /* No strong shadow */
+        }
+        a:hover ~ .custom-cursor, button:hover ~ .custom-cursor, .star-button:hover ~ .custom-cursor {
+            width: 30px; /* Slightly larger on hover */
+            height: 30px;
+            background-color: rgba(0, 123, 255, 0.3); /* Slightly more opaque on hover */
+            opacity: 1;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.2); /* Soft glow on hover */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+            section {
+                padding-top: 4rem;
+                padding-bottom: 4rem;
+            }
+            .hero-section h1 {
+                font-size: 3.5rem;
+            }
+            .hero-section p {
+                font-size: 1.125rem;
+            }
+            h2.headline-gradient {
+                font-size: 2.5rem;
+            }
+            .skill-card, .project-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Ensure no default browser margins/paddings */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body class="text-text-dark bg-bg-light overflow-x-hidden">
+    <div class="custom-cursor"></div>
+
+    <div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div id="loading-3d" class="w-32 h-32 mx-auto mb-8"></div>
+            <div class="loading-text text-2xl font-bold mb-4">Loading...</div>
+            <div class="progress-bar w-64 h-2 rounded-full overflow-hidden">
+                <div id="progress-fill" class="h-full w-0 transition-all duration-300"></div>
+            </div>
+            <div id="progress-text" class="mt-2 text-sm">0%</div>
+        </div>
+    </div>
+
+    <button id="theme-toggle" class="fixed top-6 right-6 z-40 w-12 h-12 bg-card-bg-light dark:bg-card-bg-dark rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-md">
+        <i id="theme-icon" class="fas fa-moon text-accent-blue dark:text-secondary-light"></i>
+    </button>
+
+    <nav id="main-header" class="fixed top-0 left-0 w-full z-30 py-4 px-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="text-2xl font-bold text-text-dark logo">
+                goldjunge91
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#about" class="nav-link">Über mich</a>
+                <a href="#skills" class="nav-link">Skills</a>
+                <a href="#projects" class="nav-link">Projekte</a>
+                <a href="#contact" class="nav-link">Kontakt</a>
+            </div>
+        </div>
+    </nav>
+
+    <div id="star-field" class="fixed inset-0 z-0"></div>
+
+    <main class="relative z-10">
+        <section id="home" class="min-h-screen flex items-center justify-center relative bg-bg-light dark:bg-bg-dark">
+            <div class="text-center max-w-4xl mx-auto px-6">
+                <div class="mb-8">
+                    <h1 class="text-6xl md:text-8xl font-bold mb-6">
+                        goldjunge91
+                    </h1>
+                    <p class="text-xl md:text-2xl mb-8 text-text-light">
+                        Full Stack Developer & Web Innovator
+                    </p>
+                </div>
+                
+                <div class="star-navigation grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
+                    <div class="star-button" data-target="about">
+                        <div class="star-icon">💫</div>
+                        <span>Über mich</span>
+                    </div>
+                    <div class="star-button" data-target="skills">
+                        <div class="star-icon">🚀</div>
+                        <span>Skills</span>
+                    </div>
+                    <div class="star-button" data-target="projects">
+                        <div class="star-icon">🌌</div>
+                        <span>Projekte</span>
+                    </div>
+                    <div class="star-button" data-target="contact">
+                        <div class="star-icon">📬</div>
+                        <span>Kontakt</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="min-h-screen py-20 px-6 bg-secondary-light dark:bg-bg-dark">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-4xl md:text-6xl font-bold text-center mb-16 headline-gradient">
+                    Über mich
+                </h2>
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6">
+                        <p class="text-lg text-text-dark leading-relaxed dark:text-text-light-dark-mode">
+                            Hallo! Ich bin goldjunge91, ein leidenschaftlicher Full Stack Developer mit einer Vorliebe für moderne Webtechnologien und effektive digitale Lösungen.
+                        </p>
+                        <p class="text-lg text-text-dark leading-relaxed dark:text-text-light-dark-mode">
+                            Meine Expertise liegt in der Entwicklung innovativer Web-Lösungen, die sowohl funktional als auch ästhetisch ansprechend sind. Von reaktionsschnellen Frontend-Anwendungen bis hin zu robusten Backend-Systemen.
+                        </p>
+                        <p class="text-lg text-text-dark leading-relaxed dark:text-text-light-dark-mode">
+                            Ich arbeite gerne mit modernen Technologien wie JavaScript, React, Node.js und verschiedenen Datenbanken, um effiziente und benutzerfreundliche digitale Produkte zu realisieren.
+                        </p>
+                    </div>
+                    <div class="relative">
+                        <div class="w-64 h-64 mx-auto bg-gradient-to-br from-accent-blue/10 to-accent-green/10 rounded-full flex items-center justify-center shadow-lg border border-border-light dark:border-border-dark">
+                            <i class="fas fa-laptop-code text-6xl text-accent-blue"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="min-h-screen py-20 px-6 bg-bg-light dark:bg-card-bg-dark">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-4xl md:text-6xl font-bold text-center mb-16 headline-gradient">
+                    Skills
+                </h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="skill-card">
+                        <div class="skill-icon">
+                            <i class="fab fa-js-square text-4xl text-yellow-500"></i>
+                        </div>
+                        <h3>JavaScript</h3>
+                        <p>ES6+, React, Vue.js, Node.js</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">
+                            <i class="fab fa-html5 text-4xl text-orange-500"></i>
+                        </div>
+                        <h3>Frontend</h3>
+                        <p>HTML5, CSS3, TailwindCSS, Sass</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">
+                            <i class="fas fa-cube text-4xl text-accent-blue"></i>
+                        </div>
+                        <h3>3D Graphics</h3>
+                        <p>Three.js, WebGL (Subtile Integration)</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">
+                            <i class="fab fa-git-alt text-4xl text-red-500"></i>
+                        </div>
+                        <h3>Tools</h3>
+                        <p>Git, Vite, Webpack, Docker</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">
+                            <i class="fas fa-database text-4xl text-green-500"></i>
+                        </div>
+                        <h3>Backend</h3>
+                        <p>Node.js, MongoDB, PostgreSQL, API Design</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">
+                            <i class="fas fa-mobile-alt text-4xl text-purple-500"></i>
+                        </div>
+                        <h3>Responsive</h3>
+                        <p>Mobile-First, PWA, Cross-Browser</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="min-h-screen py-20 px-6 bg-secondary-light dark:bg-bg-dark">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-4xl md:text-6xl font-bold text-center mb-16 headline-gradient">
+                    Projekte
+                </h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="project-card">
+                        <div class="project-image bg-gradient-to-br from-accent-blue/5 to-accent-green/5">
+                            <i class="fas fa-project-diagram text-4xl text-accent-blue"></i>
+                        </div>
+                        <div class="project-content">
+                            <h3>Business Web App</h3>
+                            <p class="text-text-light dark:text-text-light-dark-mode">Professionelle Webanwendung mit Fokus auf Benutzerfreundlichkeit und Skalierbarkeit.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="tech-tag">React</span>
+                                <span class="tech-tag">Node.js</span>
+                                <span class="tech-tag">PostgreSQL</span>
+                            </div>
+                            <div class="flex gap-4">
+                                <a href="#" class="btn btn-primary">Live Demo</a>
+                                <a href="https://github.com/goldjunge91" class="btn btn-secondary" target="_blank">GitHub</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card">
+                        <div class="project-image bg-gradient-to-br from-accent-green/5 to-accent-blue/5">
+                            <i class="fas fa-chart-line text-4xl text-accent-green"></i>
+                        </div>
+                        <div class="project-content">
+                            <h3>Analytics Dashboard</h3>
+                            <p class="text-text-light dark:text-text-light-dark-mode">Interaktives Dashboard zur Visualisierung komplexer Daten und Metriken.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="tech-tag">Vue.js</span>
+                                <span class="tech-tag">D3.js</span>
+                                <span class="tech-tag">Firebase</span>
+                            </div>
+                            <div class="flex gap-4">
+                                <a href="#" class="btn btn-primary">Live Demo</a>
+                                <a href="https://github.com/goldjunge91" class="btn btn-secondary" target="_blank">GitHub</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <div class="project-image bg-gradient-to-br from-purple-500/5 to-pink-500/5">
+                            <i class="fas fa-palette text-4xl text-purple-500"></i>
+                        </div>
+                        <div class="project-content">
+                            <h3>Design Showcase</h3>
+                            <p class="text-text-light dark:text-text-light-dark-mode">Kreative Portfolio-Seite mit sanften Animationen und ansprechendem Layout.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="tech-tag">HTML5</span>
+                                <span class="tech-tag">CSS3</span>
+                                <span class="tech-tag">GSAP</span>
+                            </div>
+                            <div class="flex gap-4">
+                                <a href="#" class="btn btn-primary">Live Demo</a>
+                                <a href="https://github.com/goldjunge91" class="btn btn-secondary" target="_blank">GitHub</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="min-h-screen py-20 px-6 bg-bg-light dark:bg-card-bg-dark">
+            <div class="container mx-auto max-w-4xl text-center">
+                <h2 class="text-4xl md:text-6xl font-bold mb-16 headline-gradient">
+                    Kontakt
+                </h2>
+                <p class="text-xl text-text-light mb-12 dark:text-text-light-dark-mode">
+                    Bereit für ein neues Projekt? Lass uns zusammenarbeiten!
+                </p>
+                
+                <div class="flex justify-center space-x-8 mb-12">
+                    <a href="mailto:goldjunge91@example.com" class="contact-link">
+                        <i class="fas fa-envelope text-3xl"></i>
+                        <span>E-Mail</span>
+                    </a>
+                    <a href="https://github.com/goldjunge91" class="contact-link" target="_blank">
+                        <i class="fab fa-github text-3xl"></i>
+                        <span>GitHub</span>
+                    </a>
+                    <a href="https://linkedin.com/in/goldjunge91" class="contact-link" target="_blank">
+                        <i class="fab fa-linkedin text-3xl"></i>
+                        <span>LinkedIn</span>
+                    </a>
+                </div>
+
+                <form class="max-w-lg mx-auto space-y-6" id="contact-form">
+                    <div>
+                        <input type="text" placeholder="Dein Name" required>
+                    </div>
+                    <div>
+                        <input type="email" placeholder="Deine E-Mail" required>
+                    </div>
+                    <div>
+                        <textarea placeholder="Deine Nachricht" rows="5" required class="resize-none"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">
+                        Nachricht senden
+                    </button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="relative z-10 py-8 text-center text-text-light dark:text-text-light-dark-mode bg-bg-light dark:bg-bg-dark">
+        <p>&copy; 2024 goldjunge91. Made with ❤️ and Three.js</p>
+    </footer>
+
+    <script type="module" src="script.js"></script>
+    <script>
+        // Theme toggle logic (remains similar)
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.body.classList.add('dark');
+                themeIcon.classList.remove('fa-moon', 'text-accent-blue');
+                themeIcon.classList.add('fa-sun', 'text-secondary-light');
+            } else {
+                document.body.classList.remove('dark');
+                themeIcon.classList.remove('fa-sun', 'text-secondary-light');
+                themeIcon.classList.add('fa-moon', 'text-accent-blue');
+            }
+            // Re-apply header style to update background on theme change
+            const header = document.getElementById('main-header');
+            if (document.body.classList.contains('dark')) {
+                if (window.scrollY > 50) {
+                    header.style.backgroundColor = 'rgba(26, 26, 26, 0.95)';
+                } else {
+                    header.style.backgroundColor = 'rgba(26, 26, 26, 0.8)';
+                }
+            } else {
+                if (window.scrollY > 50) {
+                    header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+                } else {
+                    header.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                }
+            }
+        };
+
+        // Load saved theme on initial load or default to light
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else {
+            applyTheme('light'); // Default to light mode for this design
+        }
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.body.classList.contains('dark') ? 'dark' : 'light';
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                applyTheme(newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+        }
+        
+        // Header scroll behavior
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('main-header');
+            if (window.scrollY > 50) { // Adjust scroll threshold as needed
+                header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)'; /* Less transparent white */
+                header.style.backdropFilter = 'blur(10px)';
+                header.classList.add('shadow-md');
+            } else {
+                header.style.backgroundColor = 'rgba(255, 255, 255, 0.8)'; /* More transparent white */
+                header.style.backdropFilter = 'blur(10px)';
+                header.classList.remove('shadow-md');
+            }
+
+            // Dark mode header adjustment
+            if (document.body.classList.contains('dark')) {
+                if (window.scrollY > 50) {
+                    header.style.backgroundColor = 'rgba(26, 26, 26, 0.95)';
+                } else {
+                    header.style.backgroundColor = 'rgba(26, 26, 26, 0.8)';
+                }
+            }
+        });
+
+        // Smooth scroll for internal links
+        document.querySelectorAll('.nav-link[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Star button navigation
+        document.querySelectorAll('.star-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const target = button.getAttribute('data-target');
+                const section = document.getElementById(target);
+                
+                if (section) {
+                    gsap.to(button, {
+                        scale: 0.95, // Subtle click animation
+                        duration: 0.1,
+                        yoyo: true,
+                        repeat: 1,
+                        ease: "power2.out"
+                    });
+                    section.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    // Particle effect for elegant theme, subtle
+                    createParticleEffect(button); 
+                }
+            });
+            // Hover effects for star buttons are handled in script.js (GSAP)
+        });
+    </script>
+</body>
+</html>

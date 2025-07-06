@@ -1,564 +1,834 @@
-// script.js
+// Modern JavaScript for goldjunge91 Portfolio - Inspired by snp.agency
 
-// Import Locomotive Scroll
-import LocomotiveScroll from 'locomotive-scroll';
+// Global variables
+let scene, camera, renderer, particles;
+let preloaderScene, preloaderCamera, preloaderRenderer, preloaderParticles;
+let isLoaded = false;
+let currentTheme = 'light';
 
-// Three.js Scene Setup
-let scene, camera, renderer, stars = [], loadingObject;
-let mouseX = 0, mouseY = 0;
-let windowHalfX = window.innerWidth / 2;
-let windowHalfY = window.innerHeight / 2;
-let scroll; // Declare locomotive scroll instance
+// DOM elements
+const preloader = document.getElementById('preloader');
+const counter = document.getElementById('counter');
+const progressFill = document.getElementById('progress-fill');
+const themeToggle = document.getElementById('theme-toggle');
+const themeIcon = document.getElementById('theme-icon');
+const nav = document.getElementById('nav');
 
-// Loading Progress
-let loadingProgress = 0;
-const loadingDuration = 2500; // Faster loading for immersive feel
-
-// Initialize Everything
+// Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    initLoading();
+    initPreloaderAnimation();
+    initPreloader();
     initTheme();
     initNavigation();
-    initAnimations();
-    startLoading();
+    initThreeJS();
+    initScrollAnimations();
+    initFormHandler();
 });
 
-// Loading Screen with 3D Effects (more vibrant/prominent)
-function initLoading() {
-    const loadingContainer = document.getElementById('loading-3d');
+// Initialize spectacular preloader animation
+function initPreloaderAnimation() {
+    const canvas = document.getElementById('preloader-canvas');
+    if (!canvas) return;
     
-    // Create Three.js scene for loading
-    const loadingScene = new THREE.Scene();
-    const loadingCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    const loadingRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    
-    loadingRenderer.setSize(128, 128);
-    loadingRenderer.setClearColor(0x000000, 0); // Transparent background
-    loadingContainer.appendChild(loadingRenderer.domElement);
-    
-    // Create spinning energy ball (vibrant neon)
-    const geometry = new THREE.IcosahedronGeometry(1.2, 1); // Slightly larger
-    const material = new THREE.MeshBasicMaterial({
-        color: 0x00f5ff, // Neon Blue
-        wireframe: true,
-        transparent: true,
-        opacity: 0.9 // Higher opacity for prominence
+    // Setup Three.js scene for preloader
+    preloaderScene = new THREE.Scene();
+    preloaderCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    preloaderRenderer = new THREE.WebGLRenderer({ 
+        canvas: canvas,
+        alpha: true, 
+        antialias: true,
+        powerPreference: "high-performance"
     });
     
-    loadingObject = new THREE.Mesh(geometry, material);
-    loadingScene.add(loadingObject);
+    preloaderRenderer.setSize(window.innerWidth, window.innerHeight);
+    preloaderRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     
-    // Add particles around the energy ball (vibrant neon)
-    const particleGeometry = new THREE.BufferGeometry();
-    const particleCount = 80; // More particles
-    const positions = new Float32Array(particleCount * 3);
+    // Create spectacular particle system
+    createPreloaderParticles();
     
-    for (let i = 0; i < particleCount * 3; i += 3) {
-        positions[i] = (Math.random() - 0.5) * 8; // Wider spread
-        positions[i + 1] = (Math.random() - 0.5) * 8;
-        positions[i + 2] = (Math.random() - 0.5) * 8;
+    // Camera position
+    preloaderCamera.position.z = 5;
+    
+    // Mouse interaction
+    let mouse = { x: 0, y: 0 };
+    let mouseTarget = { x: 0, y: 0 };
+    
+    document.addEventListener('mousemove', (event) => {
+        mouseTarget.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouseTarget.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    });
+    
+    // Animation loop for preloader
+    let time = 0;
+    function animatePreloader() {
+        if (!preloaderParticles) return;
+        
+        time += 0.01;
+        
+        // Smooth mouse following
+        mouse.x += (mouseTarget.x - mouse.x) * 0.05;
+        mouse.y += (mouseTarget.y - mouse.y) * 0.05;
+        
+        // Animate particles
+        if (preloaderParticles.length) {
+            preloaderParticles.forEach((particleSystem, index) => {
+                particleSystem.rotation.x = time * 0.2 + index * 0.1;
+                particleSystem.rotation.y = time * 0.3 + index * 0.15;
+                particleSystem.rotation.z = time * 0.1 + index * 0.05;
+                
+                // Mouse interaction
+                particleSystem.position.x = Math.sin(time + index) * 0.5 + mouse.x * 0.3;
+                particleSystem.position.y = Math.cos(time + index) * 0.3 + mouse.y * 0.2;
+            });
+        }
+        
+        preloaderRenderer.render(preloaderScene, preloaderCamera);
+        
+        if (preloader && preloader.style.display !== 'none') {
+            requestAnimationFrame(animatePreloader);
+        }
     }
     
-    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    animatePreloader();
     
-    const particleMaterial = new THREE.PointsMaterial({
-        color: 0xb300ff, // Neon Purple
-        size: 0.2, // Larger particle size
-        transparent: true,
-        opacity: 0.8 // Higher opacity
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        preloaderCamera.aspect = window.innerWidth / window.innerHeight;
+        preloaderCamera.updateProjectionMatrix();
+        preloaderRenderer.setSize(window.innerWidth, window.innerHeight);
     });
+}
+
+// Create spectacular particle systems for preloader
+function createPreloaderParticles() {
+    preloaderParticles = [];
     
-    const particles = new THREE.Points(particleGeometry, particleMaterial);
-    loadingScene.add(particles);
+    // Create multiple particle systems with different properties
+    const particleConfigs = [
+        { count: 800, size: 0.01, color: 0x3b82f6, speed: 1, spread: 8 },
+        { count: 600, size: 0.015, color: 0x8b5cf6, speed: 2.8, spread: 50 },
+        { count: 400, size: 0.02, color: 0x10b981, speed: 1.6, spread: 100 },
+        { count: 200, size: 0.025, color: 0xffffff, speed: 2.4, spread: 100 }
+    ];
     
-    loadingCamera.position.z = 3;
-    
-    // Animation loop for loading screen
-    function animateLoading() {
-        if (loadingObject) {
-            loadingObject.rotation.x += 0.02; 
-            loadingObject.rotation.y += 0.02;
-            particles.rotation.x -= 0.01;
-            particles.rotation.y += 0.01;
+    particleConfigs.forEach((config, index) => {
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(config.count * 3);
+        const colors = new Float32Array(config.count * 3);
+        const sizes = new Float32Array(config.count);
+        const velocities = new Float32Array(config.count * 3);
+        
+        const color = new THREE.Color(config.color);
+        
+        for (let i = 0; i < config.count; i++) {
+            const i3 = i * 3;
             
-            loadingRenderer.render(loadingScene, loadingCamera);
-            requestAnimationFrame(animateLoading);
+            // Position - create spiral galaxy effect
+            const radius = Math.random() * config.spread;
+            const angle = Math.random() * Math.PI * 2;
+            const height = (Math.random() - 0.5) * 4;
+            
+            positions[i3] = Math.cos(angle) * radius;
+            positions[i3 + 1] = height;
+            positions[i3 + 2] = Math.sin(angle) * radius;
+            
+            // Velocities for movement
+            velocities[i3] = (Math.random() - 0.5) * 0.02;
+            velocities[i3 + 1] = (Math.random() - 0.5) * 0.02;
+            velocities[i3 + 2] = (Math.random() - 0.5) * 0.02;
+            
+            // Colors with variation
+            const colorVariation = 1 + (Math.random() - 0.5) * 0.3;
+            colors[i3] = color.r * colorVariation;
+            colors[i3 + 1] = color.g * colorVariation;
+            colors[i3 + 2] = color.b * colorVariation;
+            
+            // Sizes - much smaller particles
+            sizes[i] = config.size * (0.1 + Math.random() * 0.3);
         }
-    }
+        
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+        
+        const material = new THREE.PointsMaterial({
+            size: config.size * 0.5, // Even smaller base size
+            transparent: true,
+            opacity: 0.8,
+            vertexColors: true,
+            blending: THREE.AdditiveBlending,
+            sizeAttenuation: true
+        });
+        
+        const particleSystem = new THREE.Points(geometry, material);
+        particleSystem.userData = { velocities, config };
+        preloaderScene.add(particleSystem);
+        preloaderParticles.push(particleSystem);
+    });
     
-    animateLoading();
+    // Add animated lights
+    const light1 = new THREE.PointLight(0x3b82f6, 1, 100);
+    light1.position.set(10, 10, 10);
+    preloaderScene.add(light1);
+    
+    const light2 = new THREE.PointLight(0x8b5cf6, 1, 100);
+    light2.position.set(-10, -10, 10);
+    preloaderScene.add(light2);
+    
+    // Animate lights
+    gsap.to(light1.position, {
+        duration: 4,
+        x: -10,
+        y: -10,
+        repeat: -1,
+        yoyo: true,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to(light2.position, {
+        duration: 3,
+        x: 10,
+        y: 10,
+        repeat: -1,
+        yoyo: true,
+        ease: "power2.inOut"
+    });
 }
 
-// Start Loading Process
-function startLoading() {
-    const progressFill = document.getElementById('progress-fill');
-    const progressText = document.getElementById('progress-text');
-    const startTime = Date.now();
-    
-    function updateProgress() {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / loadingDuration, 1);
-        
-        progressFill.style.width = `${progress * 100}%`;
-        progressText.textContent = `${Math.round(progress * 100)}%`;
-        
-        if (progress < 1) {
-            requestAnimationFrame(updateProgress);
-        } else {
-            setTimeout(finishLoading, 300); // Shorter delay after full progress
+// Enhanced preloader with progress and effects
+function initPreloader() {
+    let count = 0;
+    const targetCount = 100;
+    const duration = 3000; // 3 seconds for more dramatic effect
+    const increment = targetCount / (duration / 16); // 60fps
+
+    function updateCounter() {
+        count += increment;
+        if (count >= targetCount) {
+            count = targetCount;
+            counter.textContent = String(count).padStart(2, '0');
+            progressFill.style.width = '100%';
+            
+            // Add dramatic pause before hiding
+            setTimeout(hidePreloader, 800);
+            return;
         }
+        
+        counter.textContent = String(Math.floor(count)).padStart(2, '0');
+        progressFill.style.width = `${count}%`;
+        
+        // Add particle burst effect at certain milestones
+        if (Math.floor(count) % 20 === 0 && Math.floor(count) > 0) {
+            createParticleBurst();
+        }
+        
+        requestAnimationFrame(updateCounter);
     }
-    
-    updateProgress();
+
+    // Start counting after particles are initialized
+    setTimeout(updateCounter, 1000);
 }
 
-// Finish Loading and Show Main Content
-function finishLoading() {
-    const loadingScreen = document.getElementById('loading-screen');
+// Create particle burst effect for milestones
+function createParticleBurst() {
+    const particlesContainer = document.getElementById('preloader-particles');
+    if (!particlesContainer) return;
     
-    gsap.to(loadingScreen, {
+    for (let i = 0; i < 10; i++) {
+        const particle = document.createElement('div');
+        particle.style.cssText = `
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            pointer-events: none;
+            animation: particleFloat 2s ease-out forwards;
+            animation-delay: ${i * 0.1}s;
+        `;
+        
+        const angle = (i / 10) * Math.PI * 2;
+        const distance = 100 + Math.random() * 50;
+        
+        particle.style.setProperty('--end-x', `${Math.cos(angle) * distance}px`);
+        particle.style.setProperty('--end-y', `${Math.sin(angle) * distance}px`);
+        
+        particlesContainer.appendChild(particle);
+        
+        // Remove particle after animation
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.parentNode.removeChild(particle);
+            }
+        }, 2000);
+    }
+}
+
+// Enhanced hide preloader with spectacular exit animation
+function hidePreloader() {
+    // Create final explosion effect
+    createFinalExplosion();
+    
+    // Animate preloader elements out
+    const tl = gsap.timeline();
+    
+    tl.to('.preloader-progress', {
+        scaleX: 0,
+        duration: 0.3,
+        ease: "power2.in"
+    })
+    .to('.preloader-counter', {
+        scale: 0,
+        rotation: 360,
+        duration: 0.5,
+        ease: "back.in(1.7)"
+    }, "-=0.2")
+    .to('.preloader-subtitle', {
+        y: -50,
         opacity: 0,
-        duration: 0.8, // Faster fade out
+        duration: 0.4,
+        ease: "power2.in"
+    }, "-=0.3")
+    .to('.preloader-logo', {
+        scale: 0,
+        rotation: -360,
+        duration: 0.6,
+        ease: "back.in(1.7)"
+    }, "-=0.2")
+    .to(preloader, {
+        opacity: 0,
+        duration: 1,
         ease: "power2.out",
         onComplete: () => {
-            loadingScreen.style.display = 'none';
-            loadingObject = null; // Clean up loading object to stop animation
-            initStarField();
-            initLocomotiveScroll(); // Initialize Locomotive Scroll here
-            initScrollAnimations(); // These will now work with LS
-        }
-    });
-}
-
-// Initialize Star Field Background (more immersive)
-function initStarField() {
-    const container = document.getElementById('star-field');
-    
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000, 0); // Transparent background
-    container.appendChild(renderer.domElement);
-    
-    // Create stars (more of them, larger, prominent white)
-    const starGeometry = new THREE.BufferGeometry();
-    const starCount = 1200; // Increased star count
-    const positions = new Float32Array(starCount * 3);
-    
-    for (let i = 0; i < starCount * 3; i += 3) {
-        positions[i] = (Math.random() - 0.5) * 2500; // Wider spread
-        positions[i + 1] = (Math.random() - 0.5) * 2500;
-        positions[i + 2] = (Math.random() - 0.5) * 2500;
-    }
-    
-    starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    
-    const starMaterial = new THREE.PointsMaterial({
-        color: 0xf0f0f0, // Light text color (prominent white)
-        size: 2.5, // Larger size
-        transparent: true,
-        opacity: 0.9 // Higher opacity
-    });
-    
-    const starField = new THREE.Points(starGeometry, starMaterial);
-    scene.add(starField);
-    
-    // Add some colored stars (vibrant neon)
-    const coloredStarGeometry = new THREE.BufferGeometry();
-    const coloredStarCount = 150; // More colored stars
-    const coloredPositions = new Float32Array(coloredStarCount * 3);
-    const colors = new Float32Array(coloredStarCount * 3);
-    
-    const neonBlue = new THREE.Color(0x00f5ff);
-    const neonPurple = new THREE.Color(0xb300ff);
-    
-    for (let i = 0; i < coloredStarCount * 3; i += 3) {
-        coloredPositions[i] = (Math.random() - 0.5) * 2500;
-        coloredPositions[i + 1] = (Math.random() - 0.5) * 2500;
-        coloredPositions[i + 2] = (Math.random() - 0.5) * 2500;
-        
-        // Blend between neon blue and neon purple
-        const mixRatio = Math.random();
-        const color = new THREE.Color().copy(neonBlue).lerp(neonPurple, mixRatio);
-        
-        colors[i] = color.r;
-        colors[i + 1] = color.g;
-        colors[i + 2] = color.b;
-    }
-    
-    coloredStarGeometry.setAttribute('position', new THREE.BufferAttribute(coloredPositions, 3));
-    coloredStarGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    
-    const coloredStarMaterial = new THREE.PointsMaterial({
-        size: 3.5, // Larger size
-        transparent: true,
-        opacity: 1, // Full opacity
-        vertexColors: true
-    });
-    
-    const coloredStarField = new THREE.Points(coloredStarGeometry, coloredStarMaterial);
-    scene.add(coloredStarField);
-    
-    camera.position.z = 1000;
-    
-    // Mouse movement effect
-    document.addEventListener('mousemove', onDocumentMouseMove, false);
-    window.addEventListener('resize', onWindowResize, false);
-    
-    // Animation loop
-    animate();
-}
-
-// Mouse Movement Handler (more sensitive for immersive feel)
-function onDocumentMouseMove(event) {
-    mouseX = (event.clientX - windowHalfX) * 0.0005; // Increased multiplier
-    mouseY = (event.clientY - windowHalfY) * 0.0005; // Increased multiplier
-}
-
-// Window Resize Handler
-function onWindowResize() {
-    windowHalfX = window.innerWidth / 2;
-    windowHalfY = window.innerHeight / 2;
-    
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    // Update Locomotive Scroll if present
-    if (scroll) {
-        scroll.update();
-    }
-}
-
-// Animation Loop (more dynamic rotation for stars)
-function animate() {
-    requestAnimationFrame(animate);
-    
-    // Rotate camera based on mouse movement
-    camera.position.x += (mouseX - camera.position.x) * 0.05;
-    camera.position.y += (-mouseY - camera.position.y) * 0.05;
-    camera.lookAt(scene.position);
-    
-    // Rotate star fields more dynamically
-    scene.children.forEach(child => {
-        if (child instanceof THREE.Points) {
-            child.rotation.x += 0.0003; // Faster rotation
-            child.rotation.y += 0.0005; // Faster rotation
-        }
-    });
-    
-    renderer.render(scene, camera);
-}
-
-// Initialize Locomotive Scroll
-function initLocomotiveScroll() {
-    scroll = new LocomotiveScroll({
-        el: document.querySelector('[data-scroll-container]'),
-        smooth: true,
-        lerp: 0.08, // Adjust for smoother or snappier scroll
-        getDirection: true, // Get scroll direction
-        getSpeed: true, // Get scroll speed
-        // Add other options as needed
-        // For debugging: debug: true,
-    });
-
-    // Update ScrollTrigger on Locomotive Scroll events
-    scroll.on('scroll', ScrollTrigger.update);
-
-    // Pinning with ScrollTrigger and Locomotive Scroll
-    ScrollTrigger.scrollerProxy('[data-scroll-container]', {
-        scrollTop(value) {
-            if (arguments.length) {
-                scroll.scrollTo(value, { duration: 0, disableLerp: true });
+            preloader.style.display = 'none';
+            isLoaded = true;
+            // Clean up preloader scene
+            if (preloaderRenderer) {
+                preloaderRenderer.dispose();
+                preloaderRenderer = null;
             }
-            return scroll.scroll.instance.scroll.y;
-        },
-        getBoundingClientRect() {
-            return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
-        },
-        pinType: document.querySelector('[data-scroll-container]').style.transform ? 'transform' : 'fixed'
-    });
-
-    // Refresh ScrollTrigger and Locomotive Scroll on window resize
-    ScrollTrigger.addEventListener('refresh', () => scroll.update());
-    ScrollTrigger.refresh();
+            // Start main animations
+            animateHeroContent();
+            if (particles) {
+                animateParticles();
+            }
+        }
+    }, "-=0.5");
 }
 
+// Create final explosion effect
+function createFinalExplosion() {
+    const particlesContainer = document.getElementById('preloader-particles');
+    if (!particlesContainer) return;
+    
+    for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        const size = 2 + Math.random() * 6;
+        const hue = Math.random() * 360;
+        
+        particle.style.cssText = `
+            position: absolute;
+            width: ${size}px;
+            height: ${size}px;
+            background: hsl(${hue}, 70%, 60%);
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 10px hsl(${hue}, 70%, 60%);
+        `;
+        
+        const angle = (i / 30) * Math.PI * 2;
+        const distance = 150 + Math.random() * 200;
+        const duration = 1 + Math.random() * 0.5;
+        
+        particlesContainer.appendChild(particle);
+        
+        gsap.to(particle, {
+            x: Math.cos(angle) * distance,
+            y: Math.sin(angle) * distance,
+            scale: 0,
+            opacity: 0,
+            duration: duration,
+            ease: "power2.out",
+            onComplete: () => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+            }
+        });
+    }
+}
 
-// Theme Toggle (Updated for new color palette)
+// Initialize theme system
 function initTheme() {
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeIcon = document.getElementById('theme-icon');
-    const body = document.body;
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    applyTheme(savedTheme);
     
-    const applyTheme = (isDark) => {
-        if (isDark) {
-            body.classList.add('dark');
-            themeIcon.classList.remove('fa-moon');
-            themeIcon.classList.add('fa-sun');
-            themeIcon.style.color = '#f0f0f0'; // Light text color for sun icon
-        } else {
-            body.classList.remove('dark');
-            themeIcon.classList.remove('fa-sun');
-            themeIcon.classList.add('fa-moon');
-            themeIcon.style.color = '#101010'; // Dark text color for moon icon (if light mode is ever fully implemented)
-        }
-    };
-
-    // Default to dark mode for this immersive design
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    applyTheme(savedTheme === 'dark');
-    
+    // Theme toggle event
     themeToggle.addEventListener('click', () => {
-        const isDark = body.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        applyTheme(isDark);
+        currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+        applyTheme(currentTheme);
+        localStorage.setItem('theme', currentTheme);
     });
 }
 
-// Navigation
+// Apply theme with smooth transitions
+function applyTheme(theme) {
+    currentTheme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    
+    // Update theme icon
+    themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+    
+    // Update Three.js scene if it exists
+    if (scene && particles) {
+        updateParticleColors(theme);
+    }
+}
+
+// Initialize navigation with scroll effects
 function initNavigation() {
-    // Star button navigation (more dramatic hover)
-    const starButtons = document.querySelectorAll('.star-button');
-    
-    starButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const target = button.getAttribute('data-target');
-            const section = document.getElementById(target);
-            
-            if (section && scroll) { // Ensure Locomotive Scroll is initialized
-                gsap.to(button, {
-                    scale: 0.9,
-                    duration: 0.1,
-                    yoyo: true,
-                    repeat: 1,
-                    ease: "power2.out"
-                });
-                // Use Locomotive Scroll for smooth scrolling
-                scroll.scrollTo(section, {
-                    duration: 1000,
-                    easing: [0.77, 0, 0.175, 1] // snp.agency-like easing
-                });
-                
-                createParticleEffect(button);
-            }
-        });
-        
-        // Hover effects (more pronounced)
-        button.addEventListener('mouseenter', () => {
-            gsap.to(button, {
-                y: -10, // More lift
-                rotationX: 10, // Reintroduce subtle rotation
-                duration: 0.3,
-                ease: "power2.out"
-            });
-        });
-        
-        button.addEventListener('mouseleave', () => {
-            gsap.to(button, {
-                y: 0,
-                rotationX: 0,
-                duration: 0.3,
-                ease: "power2.out"
-            });
-        });
-    });
-    
-    // Regular navigation links
-    const navLinks = document.querySelectorAll('.nav-link');
-    
-    navLinks.forEach(link => {
+    // Smooth scroll for navigation links
+    document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            const target = link.getAttribute('href').substring(1);
-            const section = document.getElementById(target);
+            const targetId = link.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
             
-            if (section && scroll) { // Ensure Locomotive Scroll is initialized
-                scroll.scrollTo(section, {
-                    duration: 1000,
-                    easing: [0.77, 0, 0.175, 1]
-                });
-            } else if (section) { // Fallback if LS not active
-                 section.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
+            if (targetElement) {
+                gsap.to(window, {
+                    duration: 1,
+                    scrollTo: { y: targetElement, offsetY: 80 },
+                    ease: "power2.out"
                 });
             }
         });
     });
+    
+    // Navigation scroll effects
+    let lastScrollY = 0;
+    
+    window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+        
+        // Navigation background blur effect
+        if (currentScrollY > 50) {
+            nav.style.background = currentTheme === 'light' 
+                ? 'rgba(255, 255, 255, 0.95)' 
+                : 'rgba(0, 0, 0, 0.95)';
+        } else {
+            nav.style.background = currentTheme === 'light' 
+                ? 'rgba(255, 255, 255, 0.8)' 
+                : 'rgba(0, 0, 0, 0.8)';
+        }
+        
+        lastScrollY = currentScrollY;
+    });
 }
 
-// Create Particle Effect (more vibrant and expansive)
-function createParticleEffect(element) {
-    const rect = element.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
+// Initialize Three.js scene
+function initThreeJS() {
+    const canvas = document.getElementById('three-canvas');
+    if (!canvas) return;
     
-    for (let i = 0; i < 15; i++) { // More particles
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = centerX + 'px';
-        particle.style.top = centerY + 'px';
-        particle.style.width = Math.random() * 5 + 2 + 'px'; // Larger particles
-        particle.style.height = particle.style.width;
+    // Scene setup
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ 
+        alpha: true, 
+        antialias: true,
+        powerPreference: "high-performance"
+    });
+    
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    canvas.appendChild(renderer.domElement);
+    
+    // Create particle system
+    createParticles();
+    
+    // Camera position
+    camera.position.z = 5;
+    
+    // Mouse interaction
+    let mouse = { x: 0, y: 0 };
+    let mouseTarget = { x: 0, y: 0 };
+    
+    document.addEventListener('mousemove', (event) => {
+        mouseTarget.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouseTarget.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    });
+    
+    // Animation loop
+    function animate() {
+        requestAnimationFrame(animate);
         
-        // Use neon colors
-        particle.style.backgroundColor = Math.random() > 0.5 ? '#00f5ff' : '#b300ff'; // Mix neon blue/purple
+        // Smooth mouse following
+        mouse.x += (mouseTarget.x - mouse.x) * 0.02;
+        mouse.y += (mouseTarget.y - mouse.y) * 0.02;
         
-        document.body.appendChild(particle);
+        // Rotate particles based on mouse position
+        if (particles && isLoaded) {
+            particles.rotation.x = mouse.y * 0.1;
+            particles.rotation.y = mouse.x * 0.1;
+        }
         
-        // Animate particle (more expansive movement)
-        gsap.to(particle, {
-            x: (Math.random() - 0.5) * 300, // Wider spread
-            y: (Math.random() - 0.5) * 300, // Wider spread
-            opacity: 0,
-            scale: 0,
-            duration: 1.2, // Longer duration for effect
-            ease: "power3.out", // Stronger ease
-            onComplete: () => particle.remove()
-        });
+        renderer.render(scene, camera);
     }
+    
+    animate();
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
 }
 
-// Scroll Animations (Leveraging ScrollTrigger with Locomotive Scroll)
-function initScrollAnimations() {
-    // Fade in animations for sections (remains, now powered by ScrollTrigger/Locomotive Scroll)
-    const sections = document.querySelectorAll('section');
+// Create particle system
+function createParticles() {
+    const geometry = new THREE.BufferGeometry();
+    const particleCount = 500;
     
-    sections.forEach(section => {
-        gsap.from(section.children, {
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    const sizes = new Float32Array(particleCount);
+    
+    const color = new THREE.Color();
+    
+    for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        
+        // Position
+        positions[i3] = (Math.random() - 0.5) * 10;
+        positions[i3 + 1] = (Math.random() - 0.5) * 10;
+        positions[i3 + 2] = (Math.random() - 0.5) * 10;
+        
+        // Color
+        color.setHSL(0.6, 0.8, Math.random() * 0.5 + 0.5);
+        colors[i3] = color.r;
+        colors[i3 + 1] = color.g;
+        colors[i3 + 2] = color.b;
+        
+        // Size - much smaller
+        sizes[i] = Math.random() * 0.1 + 0.05;
+    }
+    
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    
+    const material = new THREE.PointsMaterial({
+        size: 0.02, // Much smaller size
+        transparent: true,
+        opacity: 0.6,
+        vertexColors: true,
+        blending: THREE.AdditiveBlending
+    });
+    
+    particles = new THREE.Points(geometry, material);
+    scene.add(particles);
+}
+
+// Update particle colors based on theme
+function updateParticleColors(theme) {
+    if (!particles) return;
+    
+    const colors = particles.geometry.attributes.color;
+    const color = new THREE.Color();
+    
+    for (let i = 0; i < colors.count; i++) {
+        if (theme === 'dark') {
+            color.setHSL(0.6, 0.8, Math.random() * 0.3 + 0.7);
+        } else {
+            color.setHSL(0.6, 0.8, Math.random() * 0.3 + 0.2);
+        }
+        
+        colors.setXYZ(i, color.r, color.g, color.b);
+    }
+    
+    colors.needsUpdate = true;
+}
+
+// Animate particles
+function animateParticles() {
+    if (!particles) return;
+    
+    gsap.to(particles.rotation, {
+        y: Math.PI * 2,
+        duration: 20,
+        repeat: -1,
+        ease: "none"
+    });
+    
+    gsap.to(particles.position, {
+        y: "+=0.5",
+        duration: 3,
+        repeat: -1,
+        yoyo: true,
+        ease: "power2.inOut"
+    });
+}
+
+// Animate hero content
+function animateHeroContent() {
+    const heroTitle = document.querySelector('.hero-title');
+    const heroSubtitle = document.querySelector('.hero-subtitle');
+    const heroDescription = document.querySelector('.hero-description');
+    const heroCTA = document.querySelector('.hero-cta');
+    
+    const tl = gsap.timeline();
+    
+    tl.from(heroTitle, {
+        y: 100,
+        opacity: 0,
+        duration: 1.2,
+        ease: "power3.out"
+    })
+    .from(heroSubtitle, {
+        y: 50,
+        opacity: 0,
+        duration: 1,
+        ease: "power3.out"
+    }, "-=0.8")
+    .from(heroDescription, {
+        y: 30,
+        opacity: 0,
+        duration: 1,
+        ease: "power3.out"
+    }, "-=0.6")
+    .from(heroCTA.children, {
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.2,
+        ease: "power3.out"
+    }, "-=0.4");
+}
+
+// Initialize scroll animations
+function initScrollAnimations() {
+    gsap.registerPlugin(ScrollTrigger);
+    
+    // Animate sections on scroll
+    gsap.utils.toArray('.section').forEach(section => {
+        gsap.from(section, {
+            y: 100,
             opacity: 0,
-            y: 100, // Stronger starting position
-            duration: 1.5, // Longer duration
-            stagger: 0.2,
+            duration: 1,
             ease: "power3.out",
             scrollTrigger: {
                 trigger: section,
-                scroller: '[data-scroll-container]', // Link to Locomotive Scroll
-                start: 'top 80%', // When top of section is 80% from viewport top
-                end: 'bottom top',
-                // For debugging: markers: true
+                start: "top 80%",
+                end: "bottom 20%",
+                toggleActions: "play none none reverse"
             }
         });
     });
     
-    // Parallax effect for hero section is now handled by data-scroll-speed in index.html
-}
-
-// General Animations
-function initAnimations() {
-    // Floating animation for cards (re-introducing subtly for dynamism)
-    const cards = document.querySelectorAll('.skill-card, .project-card');
-    
-    cards.forEach((card, index) => {
-        gsap.to(card, {
-            y: -5, // Subtle floating
-            duration: 2.5 + Math.random(), // Varied duration
-            repeat: -1,
-            yoyo: true,
-            ease: "sine.inOut", // Smooth sine wave
-            delay: index * 0.1
+    // Animate project cards
+    gsap.utils.toArray('.project-card').forEach(card => {
+        gsap.from(card, {
+            y: 80,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: card,
+                start: "top 85%",
+                toggleActions: "play none none reverse"
+            }
         });
     });
-
-    // Glitch effect for title (reintroducing for immersive/techy feel)
-    const title = document.querySelector('h1');
-    if (title) {
-        setInterval(() => {
-            if (Math.random() < 0.2) { // Higher chance for glitch
-                title.classList.add('glitch');
-                // For actual glitch text, might need a separate JS library or more complex CSS animation
-                setTimeout(() => title.classList.remove('glitch'), 300); // Shorter glitch duration
+    
+    // Animate skill cards
+    gsap.utils.toArray('.skill-card').forEach(card => {
+        gsap.from(card, {
+            scale: 0.8,
+            opacity: 0,
+            duration: 0.6,
+            ease: "back.out(1.7)",
+            scrollTrigger: {
+                trigger: card,
+                start: "top 85%",
+                toggleActions: "play none none reverse"
             }
-        }, 1500); // More frequent checks
-    }
+        });
+    });
+    
+    // Parallax effect for sections
+    gsap.utils.toArray('.section').forEach(section => {
+        gsap.to(section, {
+            yPercent: -50,
+            ease: "none",
+            scrollTrigger: {
+                trigger: section,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: true
+            }
+        });
+    });
 }
 
-// Contact Form Handler
-document.addEventListener('DOMContentLoaded', function() {
-    const contactForm = document.querySelector('form');
+// Form handler
+function initFormHandler() {
+    const form = document.getElementById('contact-form');
+    if (!form) return;
     
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        
+        // Simulate form submission
+        const button = form.querySelector('button[type="submit"]');
+        const originalText = button.textContent;
+        
+        button.textContent = 'Sending...';
+        button.disabled = true;
+        
+        try {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
-            const button = this.querySelector('button[type="submit"]');
-            const originalText = button.textContent;
-            
-            button.textContent = 'GESENDET! ✨'; // More impactful text
-            button.style.background = '#00f5ff'; // Neon blue for success
-            
-            gsap.to(button, {
-                scale: 1.05,
-                duration: 0.1,
-                yoyo: true,
-                repeat: 1,
-                ease: "power2.out"
+            // Show success message
+            gsap.to(form, {
+                scale: 0.95,
+                opacity: 0.7,
+                duration: 0.3,
+                onComplete: () => {
+                    button.textContent = 'Message Sent!';
+                    button.style.background = 'var(--accent-green)';
+                    
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.background = '';
+                        button.disabled = false;
+                        form.reset();
+                        
+                        gsap.to(form, {
+                            scale: 1,
+                            opacity: 1,
+                            duration: 0.3
+                        });
+                    }, 2000);
+                }
             });
-
+            
+        } catch (error) {
+            console.error('Form submission error:', error);
+            button.textContent = 'Error - Try Again';
+            button.disabled = false;
+            
             setTimeout(() => {
                 button.textContent = originalText;
-                button.style.background = ''; // Reset background (will be handled by CSS if defined)
-                this.reset();
-            }, 2500); // Longer display
-        });
-    }
-});
-
-// Performance optimization (remains as is)
-let ticking = false;
-
-function requestTick() {
-    if (!ticking) {
-        requestAnimationFrame(updateAnimations);
-        ticking = true;
-    }
-}
-
-function updateAnimations() {
-    ticking = false;
-}
-
-// Preload critical resources (remains as is)
-function preloadResources() {
-    const criticalImages = [
-        // Add any critical images here, e.g., your service images from index.html
-    ];
-    
-    criticalImages.forEach(src => {
-        const img = new Image();
-        img.src = src;
+            }, 2000);
+        }
     });
 }
 
-// Initialize preloading
-preloadResources();
-
-// Error handling for Three.js (remains as is)
-window.addEventListener('error', function(e) {
-    if (e.message.includes('WebGL')) {
-        console.warn('WebGL not supported, falling back to CSS animations');
-        document.body.classList.add('no-webgl');
-    }
-});
-
-// Responsive handling (remains as is, now includes LS update)
-// handleResize function is already added to window.addEventListener('resize') earlier
-
-// Add custom cursor effect (visual styling should be in styles.css)
-document.addEventListener('mousemove', function(e) {
-    const cursor = document.querySelector('.custom-cursor');
-    if (cursor) {
-        gsap.to(cursor, {
-            x: e.clientX,
-            y: e.clientY,
-            duration: 0.08, // Snappier movement
-            ease: "power2.out"
+// Add hover effects for interactive elements
+function addHoverEffects() {
+    // Button hover effects
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('mouseenter', () => {
+            gsap.to(btn, {
+                scale: 1.05,
+                duration: 0.3,
+                ease: "power2.out"
+            });
         });
+        
+        btn.addEventListener('mouseleave', () => {
+            gsap.to(btn, {
+                scale: 1,
+                duration: 0.3,
+                ease: "power2.out"
+            });
+        });
+    });
+    
+    // Card hover effects
+    document.querySelectorAll('.project-card, .skill-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            gsap.to(card, {
+                y: -10,
+                duration: 0.3,
+                ease: "power2.out"
+            });
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            gsap.to(card, {
+                y: 0,
+                duration: 0.3,
+                ease: "power2.out"
+            });
+        });
+    });
+}
+
+// Add interaction effects after DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(addHoverEffects, 100);
+});
+
+// Smooth scrolling for all internal links
+document.addEventListener('click', (e) => {
+    if (e.target.matches('a[href^="#"]')) {
+        e.preventDefault();
+        const targetId = e.target.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        
+        if (targetElement) {
+            gsap.to(window, {
+                duration: 1,
+                scrollTo: { y: targetElement, offsetY: 80 },
+                ease: "power2.out"
+            });
+        }
     }
 });
 
-console.log('🚀 Immersive 3D Portfolio loaded successfully!');
+// Performance optimization
+function optimizePerformance() {
+    // Lazy load images
+    const images = document.querySelectorAll('img[data-src]');
+    const imageObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.classList.remove('lazy');
+                imageObserver.unobserve(img);
+            }
+        });
+    });
+    
+    images.forEach(img => imageObserver.observe(img));
+    
+    // Reduce particle count on mobile
+    if (window.innerWidth < 768 && particles) {
+        particles.material.opacity = 0.3;
+    }
+}
+
+// Initialize performance optimizations
+document.addEventListener('DOMContentLoaded', optimizePerformance);
+
+// Export for external use
+window.portfolioApp = {
+    currentTheme,
+    applyTheme,
+    particles,
+    scene,
+    camera,
+    renderer
+};
