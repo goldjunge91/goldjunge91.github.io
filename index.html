@@ -12,8 +12,9 @@
     <meta property="og:url" content="https://goldjunge91.github.io">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- ENTFERNT: Direkte CDN-Links für Three.js, GSAP, ScrollTrigger.
+         Diese werden nun über 'import' in script.js und Vite's Modulauflösung gehandhabt. -->
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script>
@@ -66,15 +67,15 @@
         </div>
     </nav>
 
-    <!-- Star Field Background -->
+    <!-- Star Field Background / Three.js Canvas Container -->
     <div id="star-field" class="fixed inset-0 z-0"></div>
 
     <!-- Main Content -->
     <main class="relative z-10">
         <!-- Hero Section -->
-        <section id="home" class="min-h-screen flex items-center justify-center relative">
-            <div class="text-center max-w-4xl mx-auto px-6">
-                <div class="mb-8">
+        <section id="home" class="min-h-screen flex flex-col justify-start pt-20 relative">
+            <div class="text-center max-w-4xl mx-auto px-6 mt-20">
+                <div class="mb-4">
                     <h1 class="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-neon-blue via-white to-neon-purple bg-clip-text text-transparent animate-pulse">
                         goldjunge91
                     </h1>
@@ -84,7 +85,7 @@
                 </div>
                 
                 <!-- Interactive Star Navigation -->
-                <div class="star-navigation grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
+                <div class="star-navigation grid grid-cols-2 md:grid-cols-4 gap-8 mt-8 mb-20">
                     <div class="star-button" data-target="about">
                         <div class="star-icon">💫</div>
                         <span>Über mich</span>
@@ -301,6 +302,7 @@
         <p>&copy; 2024 goldjunge91. Made with ❤️ and Three.js</p>
     </footer>
 
-    <script type="module" src="script.js"></script>
+    <!-- Wichtig: script.js als Modul laden -->
+    <script type="module" src="./scripts/script.js"></script>
 </body>
 </html>
